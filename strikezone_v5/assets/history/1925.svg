@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600">
+  <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f2f0e9"/><stop offset="1" stop-color="#ccd8c8"/></linearGradient></defs>
+  <rect width="960" height="600" fill="url(#g)"/>
+  <path d="M90 430 C260 260, 370 520, 520 330 S760 180, 890 320" fill="none" stroke="#2f5f37" stroke-width="18" opacity=".18"/>
+  <circle cx="760" cy="160" r="80" fill="#2f5f37" opacity=".12"/>
+  <text x="80" y="170" font-family="Arial, sans-serif" font-weight="800" font-size="130" fill="#173226">1925</text>
+  <text x="85" y="235" font-family="Arial, sans-serif" font-size="30" fill="#526258" letter-spacing="4">REEMPLAZA ESTA IMAGEN</text>
+</svg>

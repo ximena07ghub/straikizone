@@ -1,0 +1,47 @@
+Archivos de v4 eliminados o reemplazados en v5
+
+DUPLICADOS / FORMATEADOS
+- ar_formatted.html
+- ar_nuevo.html
+- cuenta_formatted.html
+- escaner_formatted.html
+- estadisticas_formatted.html
+- filtros_formatted.html
+- index_formatted.html
+
+PÁGINA REEMPLAZADA
+- filtros.html  -> reemplazada por galeria.html + editor-media.html + foto-fan.html
+
+JS RAÍZ REORGANIZADO
+- js/account.js
+- js/auth.js
+- js/filters.js
+- js/gallery.js
+- js/game.js
+- js/nav.js
+- js/photo-db.js
+- js/photos.js
+- js/players.js
+- js/scanner.js
+- js/trivia.js
+- js/ar-cards.js
+- js/ar-carta.js
+- js/ar-model.js
+- js/ar-qr.js
+- js/tarjeta-provisional.js
+
+CSS REORGANIZADO / SIN USO
+- css/ar-carta.css
+- css/ar.css
+- css/filters.css
+- css/model-ar.css
+- css/photos.css
+- css/tarjeta-provisional.css
+- css/team-zone.css
+
+RUTAS DE ASSETS MOVIDAS
+- assets/models/* -> assets/ar/models/*
+- assets/markers/README_MARCADORES.txt -> assets/ar/targets/README_MARCADORES.txt
+
+DOCUMENTACIÓN MOVIDA, NO PERDIDA
+Los README y notas AR antiguas se movieron a docs/legacy/.

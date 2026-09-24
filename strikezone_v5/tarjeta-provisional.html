@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>StrikeZone | Tarjeta AR imprimible</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/ar/print-card.css?v=5">
+</head>
+<body>
+  <header class="print-toolbar">
+    <a href="coleccion.html">← Colección</a>
+    <div>
+      <strong>Tarjeta AR </strong>
+    </div>
+    <button type="button" data-print>Imprimir</button>
+  </header>
+
+  <main class="print-page">
+    <section class="print-intro">
+      <p class="eyebrow">StrikeZone · Colección Internacional</p>
+      <h1 class="display" data-title>Yadier Molina</h1>
+      <p> Escanea el QR del reverso, abre la experiencia AR y después apunta la cámara al  reverso  de la tarjeta.</p>
+    </section>
+
+    <section class="card-sheet" aria-label="Frente y reverso de la tarjeta">
+      <!-- Frente visual de colección -->
+      <article class="physical-card card-front-print card-front-image" aria-label="Frente de tarjeta">
+        <img data-front-print-image src="assets/cards/yadier-molina-front.png" alt="Frente de tarjeta de Yadier Molina">
+      </article>
+
+      <!-- El reverso completo, incluido el QR, es el marcador de MindAR -->
+      <article class="physical-card card-back-print card-back-image" aria-label="Reverso de tarjeta AR">
+        <img data-back-print-image src="assets/cards/yadier-molina-back.png" alt="Reverso AR de Yadier Molina">
+      </article>
+    </section>
+
+
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="js/ar/cards.js?v=5"></script>
+  <script src="js/ar/card-print.js?v=5"></script>
+</body>
+</html>

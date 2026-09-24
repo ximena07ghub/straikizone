@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#0f2418">
+  <title>StrikeZone | Carta AR</title>
+  <link rel="stylesheet" href="css/ar/card.css?v=5">
+
+  <!-- Compilador de targets. Usamos el core 1.1.4 porque esa distribución
+       sí expone window.MINDAR.Compiler en navegador. El archivo .mind generado
+       sigue usando formato v2 y luego lo consume MindAR/Three 1.2.5. -->
+  <script src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.1.4/dist/mindar-image.prod.js"></script>
+
+  <!-- Three.js + integración MindAR/Three. -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/",
+      "mindar-image-three": "https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js"
+    }
+  }
+  </script>
+</head>
+<body>
+  <main id="ar-container" class="ar-camera" aria-label="Experiencia de realidad aumentada">
+    <div class="ar-topbar">
+      <a class="ar-back" href="coleccion.html" aria-label="Volver a la colección">←</a>
+      <div class="ar-heading">
+        <span data-ar-category>INTERNACIONAL</span>
+        <strong data-ar-name>Yadier Molina</strong>
+      </div>
+      <a class="ar-card-link" data-print-link href="tarjeta-provisional.html?card=yadier-molina">Tarjeta</a>
+    </div>
+
+    <div class="ar-reticle" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+    <div class="ar-status" data-ar-status>Listo para iniciar</div>
+
+    <section class="ar-start" data-ar-start-panel>
+      <div class="ar-start-card">
+        <span class="ar-kicker">STRIKEZONE · IMAGE TRACKING</span>
+        <h1 data-start-title>Yadier Molina</h1>
+        <p>Apunta la cámara al <strong> reverso </strong>.</p>
+        <div class="ar-preview-row">
+          <img data-target-preview src="assets/cards/yadier-molina-front.png" alt="Frente de la tarjeta de Yadier Molina">
+          <div>
+            <small>Modelo actual</small>
+            <strong data-model-label>Pelota 3D </strong>
+            <span> Puedes girar la pelota, moverla con dos dedos, acercar/alejar y tocar para hacerla saltar.</span>
+          </div>
+        </div>
+        <button class="ar-primary" type="button" data-ar-start>Activar cámara AR</button>
+        <p class="ar-note">La primera vez puede tardar unos segundos mientras se prepara el reconocimiento del reverso de la tarjeta. Después se abrirá la cámara.</p>
+      </div>
+    </section>
+
+    <section class="ar-help" data-ar-help hidden>
+      <strong>Apunta al reverso de la tarjeta</strong>
+      <span>Mantén la carta visible, relativamente plana y con buena iluminación.</span>
+    </section>
+
+    <div class="ar-gesture-tip" data-gesture-tip hidden>
+      1 dedo: gira · 2 dedos: mueve + zoom · toque: animar
+    </div>
+
+    <section class="ar-info-panel" data-info-panel hidden><button type="button" data-info-close aria-label="Cerrar información">×</button><span class="ar-kicker">INFORMACIÓN DE LA CARTA</span><h2 data-info-title>Jugador</h2><p data-info-copy></p><div data-info-stats class="ar-info-stats"></div><small>La arquitectura queda preparada para narración, video y nuevas animaciones de modelos GLB.</small></section>
+    <nav class="ar-controls" aria-label="Controles del modelo" data-ar-controls hidden>
+      <button type="button" data-jump><span>▶</span>Animar</button>
+      <button type="button" data-info><span>ⓘ</span>Info</button>
+      <button type="button" data-confetti aria-pressed="false"><span>✦</span>Efectos OFF</button>
+      <button type="button" data-spin><span>↻</span>360°</button>
+      <button type="button" data-reset><span>⌂</span>Reiniciar</button>
+    </nav>
+
+    <div class="ar-error" data-ar-error hidden>
+      <strong>No se pudo iniciar la experiencia AR.</strong>
+      <span data-ar-error-text>Revisa el permiso de cámara y la conexión a internet.</span>
+      <button type="button" data-ar-retry>Intentar de nuevo</button>
+    </div>
+  </main>
+
+  <script src="js/ar/cards.js?v=5"></script>
+  <script type="module" src="js/ar/card-viewer.js?v=5"></script>
+</body>
+</html>

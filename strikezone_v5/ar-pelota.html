@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>StrikeZone | Pelota AR</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/ar/model.css">
+  <link rel="stylesheet" href="css/particles.css">
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.3.1/model-viewer.min.js"></script>
+</head>
+<body>
+  <header class="site-header" data-header><nav class="navbar container" aria-label="Navegación principal"><a class="brand" href="index.html"><img src="assets/brand/strikezone-logo.svg" alt="StrikeZone"></a><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="main-nav"><span></span><span></span><span class="sr-only">Abrir menú</span></button><div class="nav-links" id="main-nav" data-nav-menu><a class="" href="index.html">Inicio</a><a class="" href="galeria.html">Galería</a><a class="" href="novedades.html">Novedades</a><a class="" href="historia-beisbol.html">Historia</a><a class="" href="estadisticas.html">Estadísticas</a><a class="is-active" href="coleccion.html">Colección</a></div><div class="nav-actions"><a class="account-link" data-account-link href="login.html">Iniciar sesión</a></div></nav></header>
+
+  <main class="model-page container">
+    <section class="model-hero">
+      <div class="model-copy">
+        <p class="eyebrow">Carta AR</p>
+        <h1 class="display">Pelota 3D</h1>
+        <p>Explora la pelota desde el navegador y después colócala en tu espacio con realidad aumentada.</p>
+        <div class="model-instructions">
+          <div>
+            <b>1</b>
+            <span>Gira el modelo con el dedo o el mouse.</span>
+          </div>
+          <div>
+            <b>2</b>
+            <span>Toca <strong>Rebotar</strong> para activar la animación de vista previa.</span>
+          </div>
+          <div>
+            <b>3</b>
+            <span>En un teléfono compatible, toca <strong>Ver pelota en AR</strong> y apunta al piso o una mesa.</span>
+          </div>
+        </div>
+        <div class="model-controls">
+          <button class="button" data-spin type="button">Girar 360°</button>
+          <button class="button button-green" data-bounce type="button">Rebotar</button>
+          <button class="button" data-celebrate type="button">Celebrar</button>
+        </div>
+        <div class="model-fact ui-card">
+          <strong>Dato de juego</strong>
+          <span>En una pelota bateada, el giro modifica la trayectoria y la forma en que la pelota se desplaza por el aire.</span>
+        </div>
+      </div>
+      <div class="model-stage" data-model-stage>
+        <model-viewer src="assets/ar/models/pelota.glb" alt="Pelota de beisbol 3D" camera-controls auto-rotate rotation-per-second="14deg" shadow-intensity="1.1" exposure="1" ar ar-modes="webxr scene-viewer quick-look" ar-placement="floor" ar-scale="auto">
+          <button class="custom-ar" slot="ar-button" type="button">Ver pelota en AR</button>
+        </model-viewer>
+      </div>
+    </section>
+  </main>
+
+  <div id="confetti-layer" class="confetti-layer" aria-hidden="true"></div>
+
+  <footer class="site-footer container">
+    <span>StrikeZone · Pelota 3D</span>
+    <a href="coleccion.html">Volver a colección →</a>
+  </footer>
+
+  <script src="js/particles.js"></script>
+  <script src="js/ar/model-viewer.js"></script>
+  <script src="js/core/feedback.js"></script><script src="js/core/nav.js"></script>
+</body>
+</html>

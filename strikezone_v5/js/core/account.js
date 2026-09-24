@@ -1,0 +1,8 @@
+(async()=>{
+  const guest=document.querySelector('[data-account-guest]'),content=document.querySelectorAll('[data-account-content]');let session=null;try{session=JSON.parse(localStorage.getItem('strikezoneSession')||'null')}catch{}
+  if(!session){guest.hidden=false;content.forEach(x=>x.hidden=true);return}
+  document.querySelectorAll('[data-account-name]').forEach(el=>el.textContent=session.name);document.querySelectorAll('[data-account-email]').forEach(el=>el.textContent=session.email);document.querySelector('[data-account-initial]').textContent=(session.name||'S').trim().charAt(0).toUpperCase();
+  const ids=window.StrikeZoneRewards?.readCollection?.()||[];document.querySelector('[data-card-count]').textContent=ids.length;let media=[];try{media=await window.StrikeZonePhotos.all()}catch{}document.querySelector('[data-media-total]').textContent=media.length;
+  const wrap=document.querySelector('[data-profile-cards]'),players=window.STRIKEZONE_PLAYERS||[];const cards=ids.map(id=>players.find(p=>p.id===id)).filter(Boolean);if(cards.length){wrap.innerHTML=cards.map(p=>`<a class="profile-mini-card" href="coleccion.html?focus=${encodeURIComponent(p.id)}"><img src="${p.image}" alt="${p.name}"><div><strong>${p.name}</strong><small>${p.arCard||p.ar?'AR disponible':'Carta coleccionada'}</small></div></a>`).join('')}else wrap.innerHTML='<div class="empty-state">Aún no tienes cartas. Completa un reto o colecciona una carta directa.</div>';
+  document.querySelector('[data-logout]')?.addEventListener('click',()=>{localStorage.removeItem('strikezoneSession');location.href='index.html'});
+})();

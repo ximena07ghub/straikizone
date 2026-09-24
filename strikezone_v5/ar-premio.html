@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>StrikeZone | Recompensa 3D</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/ar/model.css">
+  <link rel="stylesheet" href="css/particles.css">
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.3.1/model-viewer.min.js"></script>
+</head>
+<body>
+  <header class="site-header" data-header><nav class="navbar container" aria-label="Navegación principal"><a class="brand" href="index.html"><img src="assets/brand/strikezone-logo.svg" alt="StrikeZone"></a><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="main-nav"><span></span><span></span><span class="sr-only">Abrir menú</span></button><div class="nav-links" id="main-nav" data-nav-menu><a class="" href="index.html">Inicio</a><a class="" href="galeria.html">Galería</a><a class="" href="novedades.html">Novedades</a><a class="" href="historia-beisbol.html">Historia</a><a class="" href="estadisticas.html">Estadísticas</a><a class="is-active" href="coleccion.html">Colección</a></div><div class="nav-actions"><a class="account-link" data-account-link href="login.html">Iniciar sesión</a></div></nav></header>
+
+  <main class="model-page container">
+    <section class="model-hero">
+      <div class="model-copy">
+        <p class="eyebrow">Recompensa StrikeZone</p>
+        <h1 class="display">Celebración 3D</h1>
+        <p>Una recompensa visual para cuando desbloqueas una carta. Haz girar el trofeo y activa una celebración de confeti.</p>
+        <div class="model-instructions">
+          <div>
+            <b>1</b>
+            <span>Toca <strong>Celebrar</strong> para iniciar el giro y el confeti.</span>
+          </div>
+          <div>
+            <b>2</b>
+            <span>Usa <strong>Ver trofeo en AR</strong> en un teléfono compatible para colocarlo en tu entorno.</span>
+          </div>
+          <div>
+            <b>3</b>
+            <span>Vuelve a la galería para consultar las cartas que ya desbloqueaste.</span>
+          </div>
+        </div>
+        <div class="model-controls">
+          <button class="button button-green" data-celebrate type="button">Celebrar</button>
+          <button class="button" data-spin type="button">Girar 360°</button>
+          <a class="button" href="coleccion.html">Mi colección</a>
+        </div>
+        <div class="model-fact ui-card">
+          <strong class="reward-copy">¡Carta desbloqueada!</strong>
+          <span>La celebración aparece como recompensa después de superar una trivia o alcanzar la meta del reto de bateo.</span>
+        </div>
+      </div>
+      <div class="model-stage" data-model-stage>
+        <model-viewer src="assets/ar/models/trofeo.glb" alt="Trofeo 3D de recompensa" camera-controls auto-rotate rotation-per-second="9deg" shadow-intensity="1.3" exposure="1" ar ar-modes="webxr scene-viewer quick-look" ar-placement="floor" ar-scale="auto">
+          <button class="custom-ar" slot="ar-button" type="button">Ver trofeo en AR</button>
+        </model-viewer>
+      </div>
+    </section>
+  </main>
+
+  <div id="confetti-layer" class="confetti-layer" aria-hidden="true"></div>
+
+  <footer class="site-footer container">
+    <span>StrikeZone · Recompensa 3D</span>
+    <a href="coleccion.html">Volver a la colección →</a>
+  </footer>
+
+  <script src="js/particles.js"></script>
+  <script src="js/ar/model-viewer.js"></script>
+  <script src="js/core/feedback.js"></script><script src="js/core/nav.js"></script>
+</body>
+</html>

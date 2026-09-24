@@ -1,0 +1,22 @@
+(() => {
+  const players=window.STRIKEZONE_PLAYERS||[],wrapper=document.querySelector('[data-collection-wrapper]');if(!wrapper)return;
+  const filters=[...document.querySelectorAll('[data-collection-filter]')],metaName=document.querySelector('[data-active-name]'),metaTeam=document.querySelector('[data-active-team]'),count=document.querySelector('[data-collection-count]');
+  let current='all',swiper=null,visible=[];
+  const unlocked=id=>window.StrikeZoneRewards?.isUnlocked(id);
+  function escape(v){return String(v||'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+  function card(p){const stats=(p.stats||[]).map(s=>`<div class="collect-stat"><span>${escape(s[0])}</span><b>${escape(s[1])}</b></div>`).join(''),isOpen=unlocked(p.id),hasAR=Boolean(p.arCard||p.ar);let action='';
+    if(p.primaryAction==='collect') action=`<button class="button button-light wide" data-collect="${p.id}">Coleccionar</button>`;
+    else action=`<a class="button button-light wide" data-challenge href="${escape(p.primaryHref||'#')}">${escape(p.primaryLabel||'Abrir reto')}</a>`;
+    const arAction=hasAR?`<a class="button button-ghost" data-ar-link href="${p.arCard?`ar-carta.html?card=${encodeURIComponent(p.arCard)}`:(p.ar==='pelota'?'ar-pelota.html':'ar-premio.html')}" ${isOpen?'':'hidden'}>Ver AR</a>`:'';
+    return `<div class="swiper-slide" data-player-id="${p.id}"><article class="collect-card ${isOpen?'is-unlocked':''}" data-card><div class="collect-card-inner"><div class="collect-face collect-front"><span class="collect-badge">${escape(p.category)}</span><span class="collect-lock">${isOpen?'✓':'🔒'}</span><img src="${escape(p.image)}" alt="${escape(p.name)}"></div><div class="collect-face collect-back"><div><small>${escape(p.statsLabel)}</small><h3>${escape(p.name)}</h3><p>${escape(p.team)}</p></div><div class="collect-stats">${stats}</div><p>${escape(p.bio)}</p><div class="collect-actions">${arAction}<button class="button button-ghost" data-flip>Voltear</button>${isOpen?`<a class="button button-light wide" href="cuenta.html#coleccion">En mi colección</a>`:action}</div></div></div></article></div>`}
+  function filtered(){return current==='all'?players:players.filter(p=>p.category===current)}
+  function updateMeta(index=0){const p=visible[index];if(!p)return;metaName.textContent=p.name;metaTeam.textContent=`${p.team} · ${unlocked(p.id)?'Desbloqueada':'Bloqueada'}`}
+  function bind(){wrapper.querySelectorAll('[data-card]').forEach(el=>el.addEventListener('click',e=>{if(e.target.closest('a,button'))return;el.classList.toggle('is-flipped')}));wrapper.querySelectorAll('[data-flip]').forEach(b=>b.addEventListener('click',()=>b.closest('[data-card]').classList.toggle('is-flipped')));
+    wrapper.querySelectorAll('[data-collect]').forEach(b=>b.addEventListener('click',()=>{const p=players.find(x=>x.id===b.dataset.collect);if(!p)return;if(!window.StrikeZoneRewards.requireSession(`coleccion.html?focus=${encodeURIComponent(p.id)}`))return;window.StrikeZoneRewards.unlock(p,'coleccion-directa');window.StrikeZoneFeedback?.show(`${p.name} se agregó a Mi colección`);render(p.id)}));
+    wrapper.querySelectorAll('[data-challenge]').forEach(a=>a.addEventListener('click',e=>{if(!window.StrikeZoneRewards.session()){e.preventDefault();window.StrikeZoneRewards.requireSession(a.getAttribute('href'))}}));}
+  function render(focus){visible=filtered();count.textContent=visible.length;swiper?.destroy?.(true,true);wrapper.innerHTML=visible.map(card).join('');bind();
+    if(window.Swiper){swiper=new Swiper('.collection-swiper',{slidesPerView:'auto',centeredSlides:true,spaceBetween:18,keyboard:{enabled:true},navigation:{nextEl:'[data-next]',prevEl:'[data-prev]'},pagination:{el:'.swiper-pagination',clickable:true},on:{slideChange(){updateMeta(swiper.realIndex)}}});let idx=visible.findIndex(p=>p.id===focus);if(idx<0){const q=new URLSearchParams(location.search).get('focus');idx=visible.findIndex(p=>p.id===q)}if(idx>0)swiper.slideTo(idx,0);updateMeta(Math.max(0,idx));}
+    else{document.querySelector('.collection-swiper')?.classList.add('swiper-fallback');wrapper.style.gap='14px';wrapper.parentElement.style.overflowX='auto';wrapper.querySelectorAll('.swiper-slide').forEach(x=>{x.style.opacity='1';x.style.transform='none'});updateMeta(0)}
+  }
+  filters.forEach(b=>b.addEventListener('click',()=>{current=b.dataset.collectionFilter;filters.forEach(x=>x.classList.toggle('is-active',x===b));render()}));render();
+})();

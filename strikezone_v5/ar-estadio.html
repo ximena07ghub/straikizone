@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>StrikeZone | Estadio AR</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/ar/model.css">
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.3.1/model-viewer.min.js"></script>
+</head>
+<body>
+  <header class="site-header" data-header><nav class="navbar container" aria-label="Navegación principal"><a class="brand" href="index.html"><img src="assets/brand/strikezone-logo.svg" alt="StrikeZone"></a><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="main-nav"><span></span><span></span><span class="sr-only">Abrir menú</span></button><div class="nav-links" id="main-nav" data-nav-menu><a class="" href="index.html">Inicio</a><a class="" href="galeria.html">Galería</a><a class="" href="novedades.html">Novedades</a><a class="" href="historia-beisbol.html">Historia</a><a class="" href="estadisticas.html">Estadísticas</a><a class="is-active" href="coleccion.html">Colección</a></div><div class="nav-actions"><a class="account-link" data-account-link href="login.html">Iniciar sesión</a></div></nav></header>
+
+  <main class="model-page container">
+    <section class="model-hero">
+      <div class="model-copy">
+        <p class="eyebrow">Zona Norte · estadio</p>
+        <h1 class="display">Maqueta 3D</h1>
+        <p>Observa el parque desde diferentes ángulos y colócalo sobre una superficie para explorar su volumen y distribución.</p>
+        <div class="model-instructions">
+          <div>
+            <b>1</b>
+            <span>Arrastra para rotar y pellizca para acercarte.</span>
+          </div>
+          <div>
+            <b>2</b>
+            <span>Usa <strong>Girar 360°</strong> para hacer una vuelta automática.</span>
+          </div>
+          <div>
+            <b>3</b>
+            <span>En tu teléfono, toca <strong>Ver estadio en AR</strong> y busca una superficie bien iluminada.</span>
+          </div>
+        </div>
+        <div class="model-controls">
+          <button class="button" data-spin type="button">Girar 360°</button>
+          <a class="button button-green" href="historia-equipo.html">Ver Zona Norte</a>
+        </div>
+        <div class="model-fact ui-card">
+          <strong>Parques del Norte</strong>
+          <span>La experiencia se inspira en la cultura de estadios de la división, donde plazas como Tijuana y Monterrey reúnen a miles de aficionados.</span>
+        </div>
+      </div>
+      <div class="model-stage" data-model-stage>
+        <model-viewer src="assets/ar/models/estadio.glb" alt="Maqueta 3D de estadio de beisbol" camera-controls auto-rotate rotation-per-second="8deg" shadow-intensity="1.25" exposure="1" ar ar-modes="webxr scene-viewer quick-look" ar-placement="floor" ar-scale="auto">
+          <button class="custom-ar" slot="ar-button" type="button">Ver estadio en AR</button>
+        </model-viewer>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer container">
+    <span>StrikeZone · Estadio 3D</span>
+    <a href="coleccion.html">Volver a colección →</a>
+  </footer>
+
+  <script src="js/ar/model-viewer.js"></script>
+  <script src="js/core/feedback.js"></script><script src="js/core/nav.js"></script>
+</body>
+</html>

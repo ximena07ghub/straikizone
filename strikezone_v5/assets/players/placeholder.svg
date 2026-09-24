@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1200">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#10251f"/>
+      <stop offset="1" stop-color="#486b36"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="1200" fill="url(#g)"/>
+  <circle cx="450" cy="360" r="145" fill="#e9ece3" opacity=".25"/>
+  <path d="M175 1080c20-270 125-440 275-440s255 170 275 440" fill="#e9ece3" opacity=".18"/>
+  <text x="450" y="1040" fill="#fff" opacity=".78" font-family="Arial, sans-serif" font-size="48" text-anchor="middle" letter-spacing="7">IMAGEN PENDIENTE</text>
+</svg>
