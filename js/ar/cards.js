@@ -10,6 +10,7 @@ window.STRIKEZONE_AR_CARDS = {
     mindFile: null,
     compileTarget: true,
     markerImage: 'assets/cards/yadier-molina-back.png',
+    frontImage: 'assets/cards/yadier-molina-front.png',
     model: 'assets/ar/models/pelota-yadier.glb',
     modelLabel: 'Pelota 3D · modelo propio',
     features: { animations: true, info: true, narration: false, video: false, effects: true },
@@ -20,6 +21,7 @@ window.STRIKEZONE_AR_CARDS = {
     baseZ: 0.20,
     number: '45',
     role: 'CATCHER',
+    targetSide: 'reverso',
     playerImage: 'assets/players/yadier-molina.png'
   },
   'derek-jeter': {
@@ -31,8 +33,9 @@ window.STRIKEZONE_AR_CARDS = {
     mindFile: null,
     compileTarget: true,
     markerImage: 'assets/cards/derek-jeter-front.png',
-    model: 'assets/ar/models/pelota.glb',
-    modelLabel: 'Pelota 3D · modelo provisional',
+    frontImage: 'assets/cards/derek-jeter-front.png',
+    model: 'assets/ar/models/GORRA.glb',
+    modelLabel: 'Gorra 3D · modelo de premio',
     features: { animations: true, info: true, narration: false, video: false, effects: true },
     qr: 'assets/qr/derek-jeter-ar.png',
     stats: [['AVG','.310'],['HR','260'],['RBI','1311'],['H','3465']],
@@ -41,6 +44,7 @@ window.STRIKEZONE_AR_CARDS = {
     baseZ: 0.24,
     number: '2',
     role: 'SHORTSTOP',
+    targetSide: 'frente',
     playerImage: 'assets/players/derek-jeter.png'
   },
   'ichiro-suzuki': {
@@ -52,8 +56,9 @@ window.STRIKEZONE_AR_CARDS = {
     mindFile: null,
     compileTarget: true,
     markerImage: 'assets/cards/ichiro-suzuki-front.png',
-    model: 'assets/ar/models/pelota.glb',
-    modelLabel: 'Pelota 3D · modelo provisional',
+    frontImage: 'assets/cards/ichiro-suzuki-front.png',
+    model: 'assets/ar/models/bate.glb',
+    modelLabel: 'Bate 3D · modelo de premio',
     features: { animations: true, info: true, narration: false, video: false, effects: true },
     qr: 'assets/qr/ichiro-suzuki-ar.png',
     stats: [['AVG','.311'],['HR','117'],['RBI','780'],['H','3089']],
@@ -62,6 +67,7 @@ window.STRIKEZONE_AR_CARDS = {
     baseZ: 0.24,
     number: '51',
     role: 'OUTFIELDER',
+    targetSide: 'frente',
     playerImage: 'assets/players/ichiro-suzuki.png'
   }
 };

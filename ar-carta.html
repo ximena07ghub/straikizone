@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
   <meta name="theme-color" content="#0f2418">
   <title>StrikeZone | Carta AR</title>
-  <link rel="stylesheet" href="css/ar/card.css?v=5">
+  <link rel="stylesheet" href="css/ar/card.css?v=8">
 
   <!-- Compilador de targets. Usamos el core 1.1.4 porque esa distribución
        sí expone window.MINDAR.Compiler en navegador. El archivo .mind generado
@@ -28,10 +28,10 @@
     <div class="ar-topbar">
       <a class="ar-back" href="coleccion.html" aria-label="Volver a la colección">←</a>
       <div class="ar-heading">
-        <span data-ar-category>INTERNACIONAL</span>
-        <strong data-ar-name>Yadier Molina</strong>
+        <span data-ar-category>STRIKEZONE</span>
+        <strong data-ar-name>Cargando carta…</strong>
       </div>
-      <a class="ar-card-link" data-print-link href="tarjeta-provisional.html?card=yadier-molina">Tarjeta</a>
+      <a class="ar-card-link" data-print-link href="tarjeta-provisional.html">Tarjeta</a>
     </div>
 
     <div class="ar-reticle" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -40,18 +40,18 @@
     <section class="ar-start" data-ar-start-panel>
       <div class="ar-start-card">
         <span class="ar-kicker">STRIKEZONE · IMAGE TRACKING</span>
-        <h1 data-start-title>Yadier Molina</h1>
-        <p>Apunta la cámara al <strong> reverso </strong>.</p>
+        <h1 data-start-title>Cargando carta…</h1>
+        <p>Apunta la cámara al <strong data-target-side>reverso</strong>.</p>
         <div class="ar-preview-row">
-          <img data-target-preview src="assets/cards/yadier-molina-front.png" alt="Frente de la tarjeta de Yadier Molina">
+          <img data-target-preview src="assets/brand/strikezone-logo.svg" alt="Vista previa de la tarjeta">
           <div>
             <small>Modelo actual</small>
-            <strong data-model-label>Pelota 3D </strong>
+            <strong data-model-label>Modelo 3D</strong>
             <span> Puedes girar la pelota, moverla con dos dedos, acercar/alejar y tocar para hacerla saltar.</span>
           </div>
         </div>
         <button class="ar-primary" type="button" data-ar-start>Activar cámara AR</button>
-        <p class="ar-note">La primera vez puede tardar unos segundos mientras se prepara el reconocimiento del reverso de la tarjeta. Después se abrirá la cámara.</p>
+        <p class="ar-note">La primera vez puede tardar unos segundos mientras se prepara el reconocimiento de la tarjeta. Después se abrirá la cámara.</p>
       </div>
     </section>
 
@@ -80,7 +80,26 @@
     </div>
   </main>
 
-  <script src="js/ar/cards.js?v=5"></script>
-  <script type="module" src="js/ar/card-viewer.js?v=5"></script>
+  <script src="js/ar/cards.js?v=8"></script>
+  <script>
+    (() => {
+      const id = (new URLSearchParams(location.search).get('card') || '').trim().toLowerCase();
+      const card = window.STRIKEZONE_AR_CARDS?.[id];
+      const set = (selector, value) => { const el = document.querySelector(selector); if (el && value != null) el.textContent = value; };
+      if (card) {
+        set('[data-ar-category]', card.category || 'STRIKEZONE');
+        set('[data-ar-name]', card.name);
+        set('[data-start-title]', card.name);
+        set('[data-model-label]', card.modelLabel || 'Modelo 3D');
+        set('[data-target-side]', card.targetSide || 'reverso');
+        const preview = document.querySelector('[data-target-preview]');
+        if (preview) { preview.src = card.targetImage || card.markerImage || card.frontImage; preview.alt = `Tarjeta de ${card.name}`; }
+        const print = document.querySelector('[data-print-link]');
+        if (print) print.href = `tarjeta-provisional.html?card=${encodeURIComponent(card.id)}`;
+        document.title = `StrikeZone | ${card.name} AR`;
+      }
+    })();
+  </script>
+  <script type="module" src="js/ar/card-viewer.js?v=8"></script>
 </body>
 </html>

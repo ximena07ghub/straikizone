@@ -21,3 +21,12 @@ Las funciones que dependen de APIs o permisos del navegador deben validarse desd
 6. `<model-viewer>` en las experiencias de estadio, pelota y premio.
 
 Los clips MP4 incluidos en Galería son demostrativos y están pensados para comprobar el flujo imagen/video → filtro → guardar/descargar; pueden sustituirse por los videos definitivos después.
+
+
+## Recompensa de carta del minijuego
+1. Inicia sesión y abre `juego.html`.
+2. Completa 3,000 puntos antes de 45 segundos.
+3. Verifica que la pantalla de resultado muestre una carta distinta de la seleccionada cuando exista otra disponible.
+4. Entra a `cuenta.html#coleccion` y confirma que la carta esté desbloqueada.
+5. Usa `Ver en AR` y `Ver tarjeta` desde la recompensa.
+6. Repite el reto: mientras queden cartas `gameReward:true` sin desbloquear, se priorizarán las nuevas; después se permiten repetidas.

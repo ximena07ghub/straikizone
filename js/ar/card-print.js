@@ -14,7 +14,7 @@
 
   // El frente es visual; el reverso impreso completo es el target que compila MindAR.
   const frontPrint=$('[data-front-print-image]');
-  if(frontPrint){frontPrint.src='assets/cards/yadier-molina-front.png';frontPrint.alt=`Frente de tarjeta de ${card.name}`;}
+  if(frontPrint){frontPrint.src=card.frontImage || card.markerImage || 'assets/cards/yadier-molina-front.png';frontPrint.alt=`Frente de tarjeta de ${card.name}`;}
   const backPrint=$('[data-back-print-image]');
   if(backPrint){backPrint.src=card.targetImage;backPrint.alt=`Reverso AR de ${card.name}`;}
 

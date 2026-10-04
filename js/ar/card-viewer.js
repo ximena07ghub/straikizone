@@ -3,8 +3,22 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { MindARThree } from 'mindar-image-three';
 
 const cards = window.STRIKEZONE_AR_CARDS || {};
-const requestedId = new URLSearchParams(location.search).get('card') || 'yadier-molina';
-const card = cards[requestedId] || cards['yadier-molina'];
+const params = new URLSearchParams(location.search);
+const requestedId = decodeURIComponent((params.get('card') || '').trim()).toLowerCase();
+const card = requestedId && cards[requestedId] ? cards[requestedId] : null;
+
+if (!card) {
+  document.title = 'StrikeZone | Carta AR';
+  const missingId = requestedId || 'sin-identificador';
+  document.querySelector('[data-ar-name]')?.replaceChildren(document.createTextNode('Carta no disponible'));
+  document.querySelector('[data-start-title]')?.replaceChildren(document.createTextNode('Carta no disponible'));
+  document.querySelector('[data-ar-category]')?.replaceChildren(document.createTextNode('STRIKEZONE'));
+  const error = document.querySelector('[data-ar-error]');
+  const errorText = document.querySelector('[data-ar-error-text]');
+  if (errorText) errorText.textContent = `No existe una configuración AR para la carta "${missingId}".`;
+  if (error) error.hidden = false;
+  throw new Error(`Carta AR no configurada: ${missingId}`);
+}
 
 const container = document.querySelector('#ar-container');
 const startPanel = document.querySelector('[data-ar-start-panel]');
@@ -66,6 +80,7 @@ setText('[data-ar-name]', card.name);
 setText('[data-start-title]', card.name);
 setText('[data-ar-category]', card.category);
 setText('[data-model-label]', card.modelLabel);
+setText('[data-target-side]', card.targetSide || 'reverso');
 const preview = document.querySelector('[data-target-preview]');
 if(preview){preview.src=card.targetImage || card.markerImage;preview.alt=`Reverso de la tarjeta de ${card.name}`;}
 const printLink = document.querySelector('[data-print-link]');
@@ -147,7 +162,7 @@ function createConfetti(){
 }
 
 async function loadModel(){
-  status('Cargando pelota 3D…');
+  status(`Cargando ${card.modelLabel || 'modelo 3D'}…`);
   const loader = new GLTFLoader();
   const gltf = await loader.loadAsync(card.model);
   modelPivot = new THREE.Group();
