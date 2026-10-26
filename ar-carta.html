@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
   <meta name="theme-color" content="#0f2418">
   <title>StrikeZone | Carta AR</title>
-  <link rel="stylesheet" href="css/ar/card.css?v=8">
+  <link rel="stylesheet" href="css/ar/card.css?v=10">
 
   <!-- Compilador de targets. Usamos el core 1.1.4 porque esa distribución
        sí expone window.MINDAR.Compiler en navegador. El archivo .mind generado
@@ -39,25 +39,25 @@
 
     <section class="ar-start" data-ar-start-panel>
       <div class="ar-start-card">
-        <span class="ar-kicker">STRIKEZONE · IMAGE TRACKING</span>
+        <span class="ar-kicker">STRIKEZONE · SEGUIMIENTO QR</span>
         <h1 data-start-title>Cargando carta…</h1>
-        <p>Apunta la cámara al <strong data-target-side>reverso</strong>.</p>
+        <p>Apunta la cámara al <strong data-target-side>QR del modelo</strong>.</p>
         <div class="ar-preview-row">
-          <img data-target-preview src="assets/brand/strikezone-logo.svg" alt="Vista previa de la tarjeta">
+          <img data-target-preview src="assets/brand/strikezone-logo.svg" alt="Vista previa del marcador QR del modelo">
           <div>
             <small>Modelo actual</small>
             <strong data-model-label>Modelo 3D</strong>
-            <span> Puedes girar la pelota, moverla con dos dedos, acercar/alejar y tocar para hacerla saltar.</span>
+            <span> Puedes girar el modelo, moverlo con dos dedos, acercar/alejar y tocar para activar su animación.</span>
           </div>
         </div>
         <button class="ar-primary" type="button" data-ar-start>Activar cámara AR</button>
-        <p class="ar-note">La primera vez puede tardar unos segundos mientras se prepara el reconocimiento de la tarjeta. Después se abrirá la cámara.</p>
+        <p class="ar-note">La cámara reconoce el marcador QR de este modelo. El objeto 3D solo aparece mientras el marcador permanezca visible.</p>
       </div>
     </section>
 
     <section class="ar-help" data-ar-help hidden>
-      <strong>Apunta al reverso de la tarjeta</strong>
-      <span>Mantén la carta visible, relativamente plana y con buena iluminación.</span>
+      <strong>Apunta al QR del modelo</strong>
+      <span>Mantén el QR completo dentro de la cámara, relativamente plano y con buena iluminación.</span>
     </section>
 
     <div class="ar-gesture-tip" data-gesture-tip hidden>
@@ -80,26 +80,31 @@
     </div>
   </main>
 
-  <script src="js/ar/cards.js?v=8"></script>
+  <script src="js/ar/cards.js?v=10"></script>
   <script>
     (() => {
-      const id = (new URLSearchParams(location.search).get('card') || '').trim().toLowerCase();
-      const card = window.STRIKEZONE_AR_CARDS?.[id];
+      const params = new URLSearchParams(location.search);
+      const id = (params.get('card') || '').trim().toLowerCase();
+      const modelKey = (params.get('model') || '').trim().toLowerCase();
+      const card = window.STRIKEZONE_AR_CARDS?.[id] || window.STRIKEZONE_AR_MODELS?.[modelKey]?.card;
+      const modelInfo = window.STRIKEZONE_AR_MODELS?.[modelKey];
+      const modelMode = !id && Boolean(modelInfo);
+      const name = modelMode ? `Modelo 3D · ${modelInfo.title}` : card?.name;
       const set = (selector, value) => { const el = document.querySelector(selector); if (el && value != null) el.textContent = value; };
       if (card) {
-        set('[data-ar-category]', card.category || 'STRIKEZONE');
-        set('[data-ar-name]', card.name);
-        set('[data-start-title]', card.name);
+        set('[data-ar-category]', modelMode ? 'STRIKEZONE · MODELO AR' : (card.category || 'STRIKEZONE'));
+        set('[data-ar-name]', name);
+        set('[data-start-title]', name);
         set('[data-model-label]', card.modelLabel || 'Modelo 3D');
-        set('[data-target-side]', card.targetSide || 'reverso');
+        set('[data-target-side]', 'QR del modelo');
         const preview = document.querySelector('[data-target-preview]');
-        if (preview) { preview.src = card.targetImage || card.markerImage || card.frontImage; preview.alt = `Tarjeta de ${card.name}`; }
+        if (preview) { preview.src = card.targetImage || card.markerImage; preview.alt = `Marcador QR de ${name}`; }
         const print = document.querySelector('[data-print-link]');
-        if (print) print.href = `tarjeta-provisional.html?card=${encodeURIComponent(card.id)}`;
-        document.title = `StrikeZone | ${card.name} AR`;
+        if (print) { print.href = `tarjeta-provisional.html?card=${encodeURIComponent(card.id)}`; print.hidden = modelMode; }
+        document.title = `StrikeZone | ${name} AR`;
       }
     })();
   </script>
-  <script type="module" src="js/ar/card-viewer.js?v=8"></script>
+  <script type="module" src="js/ar/card-viewer.js?v=10"></script>
 </body>
 </html>

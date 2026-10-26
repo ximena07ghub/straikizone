@@ -3,21 +3,39 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { MindARThree } from 'mindar-image-three';
 
 const cards = window.STRIKEZONE_AR_CARDS || {};
+const modelCatalog = window.STRIKEZONE_AR_MODELS || {};
 const params = new URLSearchParams(location.search);
-const requestedId = decodeURIComponent((params.get('card') || '').trim()).toLowerCase();
-const card = requestedId && cards[requestedId] ? cards[requestedId] : null;
+const requestedId = (params.get('card') || '').trim().toLowerCase();
+const requestedModelKey = (params.get('model') || '').trim().toLowerCase();
+const modelEntry = !requestedId && requestedModelKey ? modelCatalog[requestedModelKey] : null;
+const baseCard = (requestedId && cards[requestedId]) || modelEntry?.card || null;
+const modelMode = Boolean(modelEntry && !requestedId);
+const card = baseCard && modelMode ? {
+  ...baseCard,
+  name: `Modelo 3D · ${modelEntry.title}`,
+  category: 'STRIKEZONE · MODELO AR',
+  team: 'Marcador QR por modelo',
+  stats: [],
+  bio: `Este marcador abre el modelo ${modelEntry.title}. El objeto 3D permanece visible mientras la cámara detecte el QR completo.`,
+  model: modelEntry.model,
+  modelKey: modelEntry.key,
+  modelLabel: modelEntry.modelLabel,
+  targetImage: modelEntry.targetImage,
+  markerImage: modelEntry.markerImage,
+  qr: modelEntry.qr
+} : baseCard;
 
 if (!card) {
   document.title = 'StrikeZone | Carta AR';
-  const missingId = requestedId || 'sin-identificador';
-  document.querySelector('[data-ar-name]')?.replaceChildren(document.createTextNode('Carta no disponible'));
-  document.querySelector('[data-start-title]')?.replaceChildren(document.createTextNode('Carta no disponible'));
+  const missingId = requestedId || requestedModelKey || 'sin-identificador';
+  document.querySelector('[data-ar-name]')?.replaceChildren(document.createTextNode('Carta o modelo no disponible'));
+  document.querySelector('[data-start-title]')?.replaceChildren(document.createTextNode('Carta o modelo no disponible'));
   document.querySelector('[data-ar-category]')?.replaceChildren(document.createTextNode('STRIKEZONE'));
   const error = document.querySelector('[data-ar-error]');
   const errorText = document.querySelector('[data-ar-error-text]');
-  if (errorText) errorText.textContent = `No existe una configuración AR para la carta "${missingId}".`;
+  if (errorText) errorText.textContent = `No existe una configuración AR para la carta o modelo "${missingId}".`;
   if (error) error.hidden = false;
-  throw new Error(`Carta AR no configurada: ${missingId}`);
+  throw new Error(`AR no configurado: ${missingId}`);
 }
 
 const container = document.querySelector('#ar-container');
@@ -82,9 +100,9 @@ setText('[data-ar-category]', card.category);
 setText('[data-model-label]', card.modelLabel);
 setText('[data-target-side]', card.targetSide || 'reverso');
 const preview = document.querySelector('[data-target-preview]');
-if(preview){preview.src=card.targetImage || card.markerImage;preview.alt=`Reverso de la tarjeta de ${card.name}`;}
+if(preview){preview.src=card.targetImage || card.markerImage;preview.alt=`Marcador QR del modelo ${card.modelLabel || card.name}`;}
 const printLink = document.querySelector('[data-print-link]');
-if(printLink) printLink.href = `tarjeta-provisional.html?card=${encodeURIComponent(card.id)}`;
+if(printLink){printLink.href = `tarjeta-provisional.html?card=${encodeURIComponent(card.id)}`;printLink.hidden=modelMode;}
 document.title = `StrikeZone | ${card.name} AR`;
 setText('[data-info-title]', card.name);
 setText('[data-info-copy]', card.bio || 'Información de la carta.');
@@ -111,14 +129,14 @@ function loadImageElement(src){
 }
 
 async function prepareTarget(){
-  // Si en el futuro ya tenemos un .mind definitivo, se usa directamente.
+  // Si hay un .mind definitivo se usa directamente; por ahora compilamos el marcador QR compuesto del modelo.
   if(card.mindFile){
-    status('Cargando tarjeta AR…');
+    status('Cargando marcador QR del modelo…');
     return card.mindFile;
   }
 
-  // Para esta entrega Yadier usa la tarjeta completa como marcador. El bundle
-  // core de MindAR expone IMAGE.Compiler y generamos el target en memoria.
+  // El marcador contiene un QR real más un marco/título que mejora los detalles visuales
+  // para MindAR. La misma imagen aparece impresa en el reverso de las cartas asociadas al GLB.
   if(!card.compileTarget || !card.targetImage){
     throw new Error('Falta configurar el marcador AR de esta tarjeta.');
   }
@@ -128,12 +146,12 @@ async function prepareTarget(){
     throw new Error('No cargó el compilador de la tarjeta AR. Actualiza la página y vuelve a intentar con conexión a internet.');
   }
 
-  status('Preparando reconocimiento de la tarjeta… 0%');
+  status('Preparando reconocimiento del QR… 0%');
   const img=await loadImageElement(card.targetImage);
   const compiler=new Compiler();
   await compiler.compileImageTargets([img], progress=>{
     const pct=Math.max(0,Math.min(100,Math.round(progress || 0)));
-    status(`Preparando reconocimiento de la tarjeta… ${pct}%`);
+    status(`Preparando reconocimiento del QR… ${pct}%`);
   });
   const buffer=await compiler.exportData();
   if(compiledBlobUrl) URL.revokeObjectURL(compiledBlobUrl);
@@ -333,26 +351,28 @@ async function startAR(){
     scene.add(new THREE.HemisphereLight(0xffffff,0x315b3d,2.2));
     const key=new THREE.DirectionalLight(0xffffff,2.4);key.position.set(1.4,2,2.3);scene.add(key);
     anchor=mindarThree.addAnchor(0);
-    root=new THREE.Group();root.position.z=card.baseZ??.24;anchor.group.add(root);
+    root=new THREE.Group();root.visible=false;root.position.z=card.baseZ??.24;anchor.group.add(root);
     confettiGroup=createConfetti();root.add(confettiGroup);
     await loadModel();
     resetTransform();
     anchor.onTargetFound=()=>{
       targetVisible=true;
-      status('Tarjeta detectada ✓');
+      root.visible=true;
+      status('QR del modelo detectado ✓');
       helpEl.hidden=true;controlsEl.hidden=false;gestureTip.hidden=false;
       setTimeout(()=>{if(gestureTip)gestureTip.hidden=true;},4200);
     };
     anchor.onTargetLost=()=>{
       targetVisible=false;
-      status('Apunta al reverso completo de la tarjeta');
-      helpEl.hidden=false;gestureTip.hidden=true;
+      if(root)root.visible=false;
+      status('Apunta al QR completo del modelo');
+      helpEl.hidden=false;controlsEl.hidden=true;gestureTip.hidden=true;
     };
     await mindarThree.start();
     started=true;
     startPanel.hidden=true;
     helpEl.hidden=false;
-    status('Apunta al reverso completo de la tarjeta');
+    status('Apunta al QR completo del modelo');
     clock.start();
     renderer.setAnimationLoop(()=>{
       const now=performance.now();
