@@ -1,1 +1,749 @@
-.stats-summary{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:54px}.summary-card{padding:26px}.summary-card h2{font-size:2rem;margin:8px 0}.summary-card p{color:var(--muted);line-height:1.6}.snapshot-list{display:grid}.snapshot-row{display:flex;justify-content:space-between;gap:14px;padding:11px 0;border-top:1px solid var(--line)}.standings-wrap{overflow:auto;background:#fff;border:1px solid var(--line);border-radius:10px}.standings{width:100%;border-collapse:collapse;min-width:690px}.standings th,.standings td{padding:14px 15px;border-bottom:1px solid var(--line);text-align:center;font-size:.82rem}.standings th{background:#edf1ea;font-size:.7rem;text-transform:uppercase;letter-spacing:.08em}.standings .team-name{text-align:left;font-weight:850}.standings .pct{color:var(--green);font-weight:900}.stat-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.stat-feature{padding:23px}.stat-feature small{color:var(--green);font-weight:900;text-transform:uppercase;letter-spacing:.08em}.stat-feature h3{margin:8px 0}.stat-feature .number{font-family:Georgia,serif;font-size:3.2rem}.stat-feature p{color:var(--muted);line-height:1.55;font-size:.8rem}@media(max-width:800px){.stats-summary,.stat-cards{grid-template-columns:1fr}}
+
+/* Identidad de Estadísticas */
+:root {
+    --stats-green: #245c28;
+    --stats-red: #a63235;
+    --stats-blue: #245789;
+    --stats-border: rgba(17, 22, 18, .13);
+    --stats-white: #fff;
+  }
+  
+  /* Hero */
+  .stats-hero {
+    position: relative;
+    min-height: 285px;
+    overflow: hidden;
+    background: #e9ece7;
+    isolation: isolate;
+  }
+  
+  .stats-hero-image {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 62%;
+  }
+  
+  /* Difuminado claro solo en el lado del texto. */
+  .stats-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(
+      90deg,
+      rgba(248, 249, 246, .98) 0%,
+      rgba(248, 249, 246, .94) 28%,
+      rgba(248, 249, 246, .65) 48%,
+      rgba(248, 249, 246, .08) 76%,
+      transparent 100%
+    );
+  }
+  
+  .stats-hero-content {
+    position: relative;
+    padding-top: 43px;
+    padding-bottom: 44px;
+  }
+  
+  .stats-hero .eyebrow {
+    color: var(--stats-green);
+  }
+  
+  .stats-hero h1 {
+    margin: 0 0 6px;
+    font-size: clamp(3.6rem, 6.6vw, 6.7rem);
+    font-style: italic;
+    font-weight: 700;
+    line-height: .96;
+    letter-spacing: -.06em;
+    text-transform: uppercase;
+  }
+  
+  .stats-hero-subtitle {
+    margin: 0;
+    color: var(--ink);
+    font-size: clamp(1.05rem, 1.7vw, 1.4rem);
+    font-weight: 700;
+    line-height: 1.35;
+  }
+  
+  .stats-hero-line {
+    display: block;
+    width: 50px;
+    height: 4px;
+    margin: 13px 0;
+    background: var(--stats-green);
+    border-radius: 2px;
+  }
+  
+  .stats-hero-description {
+    max-width: 490px;
+    margin: 0;
+    color: #303a35;
+    font-size: .95rem;
+    line-height: 1.6;
+  }
+  
+  /* Separación general */
+  .stats-section {
+    padding-top: 48px;
+    padding-bottom: 36px;
+  }
+  
+  .stats-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(300px, .95fr);
+    align-items: start;
+    gap: 24px;
+  }
+  
+  .stats-main,
+  .stats-sidebar {
+    display: grid;
+    min-width: 0;
+    gap: 24px;
+  }
+  
+  /* Tarjetas principales */
+  .stats-card {
+    min-width: 0;
+    padding: 23px;
+    background: var(--stats-white);
+    border: 1px solid var(--stats-border);
+    border-radius: 8px;
+    box-shadow: 0 5px 18px rgba(17, 22, 18, .035);
+  }
+  
+  .stats-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    gap: 14px;
+    margin-bottom: 21px;
+    padding-left: 15px;
+    border-left: 3px solid var(--stats-green);
+  }
+  
+  .stats-card-header h2 {
+    margin: 0 0 5px;
+    color: var(--stats-green);
+    font-size: clamp(1.22rem, 2vw, 1.55rem);
+    line-height: 1.2;
+    letter-spacing: -.025em;
+  }
+  
+  .stats-card-header p {
+    margin: 0;
+    color: var(--muted);
+    font-size: .84rem;
+    line-height: 1.4;
+  }
+  
+  .stats-update {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    min-height: 32px;
+    padding: 5px 11px;
+    border: 1px solid var(--line-strong);
+    border-radius: 6px;
+    color: #3e5042;
+    background: #f8faf6;
+    font-size: .7rem;
+    font-weight: 750;
+    white-space: nowrap;
+  }
+  
+  /* Panorama */
+  .league-overview {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+  
+  .league-team {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    min-height: 165px;
+    padding: 15px 11px;
+    border: 1px solid var(--stats-border);
+    border-radius: 7px;
+    text-align: center;
+    background: #fdfdfb;
+  }
+  
+  .league-team.leader-north,
+  .league-team.leader-south {
+    border-color: rgba(166, 50, 53, .26);
+    background: #fffafa;
+  }
+  
+  .league-team.team-sultanes {
+    border-color: rgba(36, 87, 137, .24);
+    background: #f9fbfd;
+  }
+  
+  .league-label {
+    margin-bottom: 10px;
+    color: var(--stats-red);
+    font-size: .75rem;
+    font-weight: 850;
+    line-height: 1.3;
+  }
+  
+  .team-sultanes .league-label {
+    color: var(--stats-blue);
+  }
+  
+  .league-name {
+    min-height: 2.6em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink);
+    font-size: .95rem;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+  }
+  
+  .league-record {
+    display: block;
+    margin-top: 10px;
+    color: var(--ink);
+    font-size: 1.48rem;
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+  }
+  
+  .league-team small {
+    display: block;
+    margin-top: 6px;
+    color: var(--muted);
+    font-size: .72rem;
+  }
+  
+  /* Zona Norte y Sur */
+  .standings-header {
+    align-items: center;
+  }
+  
+  .zone-controls {
+    display: flex;
+    flex: 0 0 auto;
+    gap: 6px;
+  }
+  
+  .zone-controls button {
+    min-width: 100px;
+    min-height: 38px;
+    padding: 7px 11px;
+    background: #fff;
+    border: 1px solid var(--line-strong);
+    border-radius: 6px;
+    color: var(--ink);
+    font-size: .78rem;
+    font-weight: 800;
+    cursor: pointer;
+  }
+  
+  .zone-controls button.is-active {
+    color: #fff;
+    background: var(--stats-green);
+    border-color: var(--stats-green);
+  }
+  
+  .zone-controls button:hover:not(.is-active) {
+    border-color: var(--stats-green);
+  }
+  
+  .zone-controls button:focus-visible,
+  .source-button:focus-visible {
+    outline: 3px solid rgba(36, 92, 40, .3);
+    outline-offset: 3px;
+  }
+  
+  /* Tabla */
+  .standings-wrap {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    border: 1px solid var(--stats-border);
+    border-radius: 6px;
+    scrollbar-width: thin;
+  }
+  
+  .standings-wrap:focus-visible {
+    outline: 2px solid var(--stats-green);
+    outline-offset: 3px;
+  }
+  
+  .standings {
+    width: 100%;
+    min-width: 600px;
+    border-collapse: collapse;
+    font-variant-numeric: tabular-nums;
+  }
+  
+  .standings caption {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  
+  .standings th,
+  .standings td {
+    padding: 11px 10px;
+    border-bottom: 1px solid var(--stats-border);
+    color: #26302a;
+    text-align: center;
+    font-size: .78rem;
+  }
+  
+  .standings thead th {
+    background: #f0f3ee;
+    color: #26302a;
+    font-size: .7rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+  
+  .standings tbody th {
+    font-weight: 750;
+  }
+  
+  .standings .team-name {
+    text-align: left;
+    font-weight: 750;
+    white-space: nowrap;
+  }
+  
+  .standings .pct {
+    color: var(--stats-green);
+    font-weight: 900;
+  }
+  
+  .standings tbody tr:hover {
+    background: #f5f8f2;
+  }
+  
+  .standings tbody tr.is-sultanes {
+    background: rgba(89, 157, 73, .10);
+  }
+  
+  .standings tbody tr.is-sultanes .team-name {
+    color: #214f25;
+    font-weight: 900;
+  }
+  
+  .standings tbody tr:last-child th,
+  .standings tbody tr:last-child td {
+    border-bottom: 0;
+  }
+  
+  .stats-table-note {
+    margin: 14px 0 0;
+    color: var(--muted);
+    font-size: .75rem;
+    line-height: 1.6;
+  }
+  
+  /* Líderes */
+  .leaders-list {
+    display: grid;
+    gap: 9px;
+  }
+  
+  .leader-row {
+    display: grid;
+    grid-template-columns: 25px 42px 65px minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    min-height: 53px;
+    padding: 8px 11px;
+    background: #fff;
+    border: 1px solid var(--stats-border);
+    border-radius: 6px;
+  }
+  
+  .leader-icon {
+    color: #2c3a31;
+    text-align: center;
+    font-size: 1rem;
+  }
+  
+  .leader-tag {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 25px;
+    padding: 3px 5px;
+    border-radius: 4px;
+    color: #fff;
+    font-size: .69rem;
+    font-weight: 900;
+  }
+  
+  .leader-tag.green {
+    background: var(--stats-green);
+  }
+  
+  .leader-tag.red {
+    background: var(--stats-red);
+  }
+  
+  .leader-tag.blue {
+    background: var(--stats-blue);
+  }
+  
+  .leader-row strong {
+    color: #111612;
+    font-size: 1.26rem;
+    font-weight: 900;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+  
+  .leader-row > span:last-child {
+    min-width: 0;
+    font-size: .78rem;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+  }
+  
+  /* Sultanes */
+  .sultanes-card {
+    padding-bottom: 27px;
+  }
+  
+  .sultanes-kicker {
+    margin: 0 0 7px !important;
+    color: var(--stats-blue) !important;
+    font-size: .7rem !important;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+  }
+  
+  .sultanes-card .stats-card-header h2 {
+    color: var(--ink);
+  }
+  
+  .sultanes-numbers {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0;
+    padding: 12px 0 0;
+    border-top: 1px solid var(--stats-border);
+  }
+  
+  .sultanes-numbers > div {
+    min-width: 0;
+    padding: 8px 9px;
+    text-align: center;
+    border-right: 1px solid var(--stats-border);
+  }
+  
+  .sultanes-numbers > div:last-child {
+    border-right: 0;
+  }
+  
+  .sultanes-numbers strong {
+    display: block;
+    color: #111612;
+    font-size: clamp(1.2rem, 2vw, 1.65rem);
+    font-weight: 900;
+    line-height: 1.2;
+    font-variant-numeric: tabular-nums;
+  }
+  
+  .sultanes-numbers span {
+    display: block;
+    margin-top: 7px;
+    color: var(--muted);
+    font-size: .73rem;
+    line-height: 1.4;
+  }
+  
+  /* Fuente */
+  .stats-source {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 22px;
+    margin-top: 28px;
+    padding: 19px 22px;
+    background: #fff;
+    border: 1px solid var(--stats-border);
+    border-radius: 8px;
+  }
+  
+  .stats-source-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    min-width: 0;
+  }
+  
+  .source-icon {
+    flex: 0 0 34px;
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    border: 2px solid var(--stats-green);
+    border-radius: 50%;
+    color: var(--stats-green);
+    font-family: Georgia, serif;
+    font-size: 1.2rem;
+    font-weight: 900;
+  }
+  
+  .stats-source h2 {
+    margin: 0 0 5px;
+    color: var(--ink);
+    font-size: 1rem;
+  }
+  
+  .stats-source p {
+    margin: 0;
+    color: var(--muted);
+    font-size: .8rem;
+    line-height: 1.55;
+  }
+  
+  .source-button {
+    flex: 0 0 auto;
+    min-height: 42px;
+    border-color: var(--stats-green);
+    color: var(--stats-green);
+    background: #f5faf3;
+  }
+  
+  /* Tablet */
+  @media (max-width: 1050px) {
+    .stats-layout {
+      grid-template-columns: 1fr;
+    }
+  
+    .stats-main,
+    .stats-sidebar {
+      gap: 20px;
+    }
+  
+    .stats-sidebar {
+      grid-template-columns: 1fr 1fr;
+    }
+  
+    .stats-section {
+      padding-top: 40px;
+    }
+  }
+  
+  /* Tablet compacta */
+  @media (max-width: 800px) {
+    .stats-sidebar {
+      grid-template-columns: 1fr;
+    }
+  
+    .stats-hero h1 {
+      font-size: clamp(3.4rem, 8vw, 5rem);
+    }
+  
+    .stats-hero::before {
+      background: linear-gradient(
+        90deg,
+        rgba(248, 249, 246, .98),
+        rgba(248, 249, 246, .87) 60%,
+        rgba(248, 249, 246, .25)
+      );
+    }
+  }
+  
+  /* Móvil */
+  @media (max-width: 560px) {
+    .stats-hero {
+      min-height: 280px;
+    }
+  
+    .stats-hero-content {
+      padding-top: 42px;
+      padding-bottom: 40px;
+    }
+  
+    .stats-hero h1 {
+      font-size: clamp(2.6rem, 11.5vw, 4rem);
+      letter-spacing: -.055em;
+      overflow-wrap: anywhere;
+    }
+  
+    .stats-hero-subtitle {
+      font-size: 1rem;
+    }
+  
+    .stats-hero-description {
+      font-size: .85rem;
+    }
+  
+    .stats-section {
+      padding-top: 30px;
+      padding-bottom: 24px;
+    }
+  
+    .stats-layout,
+    .stats-main,
+    .stats-sidebar {
+      gap: 18px;
+    }
+  
+    .stats-card {
+      padding: 17px;
+      border-radius: 7px;
+    }
+  
+    .stats-card-header {
+      flex-direction: column;
+      gap: 11px;
+      margin-bottom: 17px;
+    }
+  
+    .stats-card-header h2 {
+      font-size: 1.28rem;
+    }
+  
+    .stats-update {
+      align-self: flex-start;
+    }
+  
+    /* Panorama vertical */
+    .league-overview {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+  
+    .league-team {
+      min-height: 120px;
+      padding: 14px;
+    }
+  
+    .league-name {
+      min-height: 0;
+    }
+  
+    .league-record {
+      margin-top: 6px;
+    }
+  
+    /* Controles compactos */
+    .zone-controls {
+      width: 100%;
+    }
+  
+    .zone-controls button {
+      flex: 1 1 0;
+      min-width: 0;
+      min-height: 42px;
+    }
+  
+    /* Solo la tabla se desplaza */
+    .standings {
+      min-width: 620px;
+    }
+  
+    .standings th,
+    .standings td {
+      padding: 10px 9px;
+      font-size: .75rem;
+    }
+  
+    /* Líderes */
+    .leader-row {
+      grid-template-columns: 20px 38px 58px minmax(0, 1fr);
+      gap: 7px;
+      padding: 9px 7px;
+    }
+  
+    .leader-row strong {
+      font-size: 1.15rem;
+    }
+  
+    .leader-row > span:last-child {
+      font-size: .74rem;
+    }
+  
+    /* Sultanes */
+    .sultanes-numbers strong {
+      font-size: 1.15rem;
+    }
+  
+    .sultanes-numbers span {
+      font-size: .67rem;
+    }
+  
+    /* Fuente */
+    .stats-source {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 16px;
+      margin-top: 20px;
+      padding: 17px;
+    }
+  
+    .stats-source-content {
+      align-items: flex-start;
+    }
+  
+    .source-button {
+      width: 100%;
+    }
+  }
+  
+  /* Móviles estrechos */
+  @media (max-width: 360px) {
+    .stats-card {
+      padding: 13px;
+    }
+  
+    .leader-row {
+      grid-template-columns: 35px 52px minmax(0, 1fr);
+    }
+  
+    .leader-icon {
+      display: none;
+    }
+  
+    .sultanes-numbers {
+      gap: 4px;
+    }
+  
+    .sultanes-numbers > div {
+      padding-inline: 4px;
+    }
+  
+    .sultanes-numbers strong {
+      font-size: 1rem;
+    }
+  }
+  
+  /* Movimiento reducido */
+  @media (prefers-reduced-motion: reduce) {
+    .stats-hero,
+    .stats-card,
+    .leader-row {
+      transition: none;
+    }
+  }
+  

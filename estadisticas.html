@@ -1,1 +1,466 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>StrikeZone | Estadísticas</title><link rel="stylesheet" href="css/base.css"><link rel="stylesheet" href="css/stats.css"></head><body><header class="site-header" data-header><nav class="navbar container" aria-label="Navegación principal"><a class="brand" href="index.html"><img src="assets/brand/strikezone-logo.svg" alt="StrikeZone"></a><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="main-nav"><span></span><span></span><span class="sr-only">Abrir menú</span></button><div class="nav-links" id="main-nav" data-nav-menu><a class="" href="index.html">Inicio</a><a class="" href="galeria.html">Galería</a><a class="" href="novedades.html">Novedades</a><a class="" href="historia-beisbol.html">Historia</a><a class="is-active" href="estadisticas.html">Estadísticas</a><a class="" href="coleccion.html">Colección</a></div><div class="nav-actions"><a class="account-link" data-account-link href="login.html">Iniciar sesión</a></div></nav></header><main><section class="page-hero container"><p class="eyebrow">Zona Norte · corte integrado al proyecto</p><h1 class="display">Estadísticas</h1><p>Una lectura clara de la clasificación y algunos líderes incluidos en la versión académica de StrikeZone.</p></section><section class="section container"><div class="stats-summary"><article class="summary-card ui-card"><p class="eyebrow">Líder del corte</p><h2>Toros de Tijuana</h2><p>60 victorias y 31 derrotas en la tabla que ya formaba parte del proyecto.</p></article><article class="summary-card ui-card"><p class="eyebrow">Panorama</p><div class="snapshot-list"><div class="snapshot-row"><span>Equipos</span><strong>10</strong></div><div class="snapshot-row"><span>Líder</span><strong>Toros</strong></div><div class="snapshot-row"><span>Monterrey</span><strong>3.º</strong></div></div></article></div><div class="section-heading"><div><p class="eyebrow">Standing</p><h2 class="display">Zona Norte</h2></div><p>G = ganados, P = perdidos, % = porcentaje y GB = juegos detrás del líder.</p></div><div class="standings-wrap"><table class="standings"><thead><tr><th>#</th><th>Equipo</th><th>G</th><th>P</th><th>%</th><th>GB</th></tr></thead><tbody><tr><td>1</td><td class="team-name">Toros de Tijuana</td><td>60</td><td>31</td><td class="pct">.659</td><td>—</td></tr><tr><td>2</td><td class="team-name">Caliente de Durango</td><td>51</td><td>42</td><td class="pct">.548</td><td>10.0</td></tr><tr><td>3</td><td class="team-name">Sultanes de Monterrey</td><td>49</td><td>44</td><td class="pct">.527</td><td>12.0</td></tr><tr><td>4</td><td class="team-name">Charros de Jalisco</td><td>48</td><td>45</td><td class="pct">.516</td><td>13.0</td></tr><tr><td>5</td><td class="team-name">Acereros de Monclova</td><td>48</td><td>45</td><td class="pct">.516</td><td>13.0</td></tr><tr><td>6</td><td class="team-name">Algodoneros de Unión Laguna</td><td>46</td><td>47</td><td class="pct">.495</td><td>15.0</td></tr><tr><td>7</td><td class="team-name">Rieleros de Aguascalientes</td><td>42</td><td>47</td><td class="pct">.472</td><td>17.0</td></tr><tr><td>8</td><td class="team-name">Saraperos de Saltillo</td><td>38</td><td>55</td><td class="pct">.409</td><td>23.0</td></tr><tr><td>9</td><td class="team-name">Tecos de los Dos Laredos</td><td>36</td><td>57</td><td class="pct">.387</td><td>25.0</td></tr><tr><td>10</td><td class="team-name">Dorados de Chihuahua</td><td>35</td><td>58</td><td class="pct">.376</td><td>26.0</td></tr></tbody></table></div><p class="source-note">Los valores corresponden al corte ya incluido en strikezone_v4. Para una entrega con datos oficiales en vivo, este bloque puede conectarse después a una fuente verificada.</p></section><section class="section container"><div class="section-heading"><div><p class="eyebrow">Líderes de club</p><h2 class="display">Números destacados.</h2></div></div><div class="stat-cards"><article class="stat-feature ui-card"><small>Toros</small><h3>Junior Lake</h3><div class="number">.323</div><p>Promedio presentado en el resumen previo del proyecto.</p></article><article class="stat-feature ui-card"><small>Charros</small><h3>Kyle Garlick</h3><div class="number">21 HR</div><p>Referencia ofensiva usada en la versión anterior.</p></article><article class="stat-feature ui-card"><small>Sultanes</small><h3>Gustavo Núñez</h3><div class="number">.321</div><p>Promedio integrado al corte informativo de StrikeZone.</p></article></div></section></main>{footer('StrikeZone · Estadísticas','historia-equipo.html','Historia de Sultanes →')}{base_scripts}</body></html>
+
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>StrikeZone | Estadísticas</title>
+
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/stats.css">
+</head>
+
+<body>
+  <!-- Navegación existente -->
+  <header class="site-header" data-header>
+    <nav class="navbar container" aria-label="Navegación principal">
+      <a class="brand" href="index.html">
+        <img
+          src="assets/brand/strikezone-logo.svg"
+          alt="StrikeZone"
+        >
+      </a>
+
+      <button
+        class="nav-toggle"
+        type="button"
+        data-nav-toggle
+        aria-expanded="false"
+        aria-controls="main-nav"
+      >
+        <span></span>
+        <span></span>
+        <span class="sr-only">Abrir menú</span>
+      </button>
+
+      <div class="nav-links" id="main-nav" data-nav-menu>
+        <a href="index.html">Inicio</a>
+        <a href="galeria.html">Galería</a>
+        <a href="novedades.html">Novedades</a>
+        <a href="historia-beisbol.html">Historia</a>
+        <a
+          class="is-active"
+          href="estadisticas.html"
+          aria-current="page"
+        >
+          Estadísticas
+        </a>
+        <a href="coleccion.html">Colección</a>
+      </div>
+
+      <div class="nav-actions">
+        <a
+          class="account-link"
+          data-account-link
+          href="login.html"
+        >
+          Iniciar sesión
+        </a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Hero -->
+    <section class="stats-hero" aria-labelledby="stats-title">
+      <img
+        class="stats-hero-image"
+        src="https://upload.wikimedia.org/wikipedia/commons/7/71/Estadio_de_beisbol_en_Monterrey.jpg"
+        alt=""
+      >
+
+      <div class="container stats-hero-content">
+        <p class="eyebrow">StrikeZone · Temporada 2026</p>
+
+        <h1 id="stats-title" class="display">
+          Estadísticas
+        </h1>
+
+        <p class="stats-hero-subtitle">
+          Datos de la Liga Mexicana de Beisbol
+        </p>
+
+        <span class="stats-hero-line" aria-hidden="true"></span>
+
+        <p class="stats-hero-description">
+          Posiciones, líderes y rendimiento de los equipos
+          durante la temporada regular 2026.
+        </p>
+      </div>
+    </section>
+
+    <!-- Estadísticas -->
+    <section
+      class="stats-section container"
+      aria-label="Resumen estadístico de la LMB"
+    >
+      <div class="stats-layout">
+
+        <!-- Columna principal -->
+        <div class="stats-main">
+
+          <!-- Panorama -->
+          <article class="stats-card" aria-labelledby="panorama-title">
+            <div class="stats-card-header">
+              <div>
+                <h2 id="panorama-title">Panorama de la liga</h2>
+                <p>Resumen de la temporada regular 2026</p>
+              </div>
+
+              <span class="stats-update">
+                Corte: 07 ago 2026
+              </span>
+            </div>
+
+            <div class="league-overview">
+
+              <div class="league-team leader-north">
+                <span class="league-label">Líder Zona Norte</span>
+
+                <strong class="league-name">
+                  Toros de Tijuana
+                </strong>
+
+                <span class="league-record">
+                  60 – 31
+                </span>
+
+                <small>.659 de porcentaje</small>
+              </div>
+
+              <div class="league-team team-sultanes">
+                <span class="league-label">
+                  Sultanes de Monterrey
+                </span>
+
+                <strong class="league-name">
+                  Monterrey
+                </strong>
+
+                <span class="league-record">
+                  49 – 44
+                </span>
+
+                <small>.527 de porcentaje</small>
+              </div>
+
+              <div class="league-team leader-south">
+                <span class="league-label">Líder Zona Sur</span>
+
+                <strong class="league-name">
+                  Diablos Rojos del México
+                </strong>
+
+                <span class="league-record">
+                  64 – 29
+                </span>
+
+                <small>.688 de porcentaje</small>
+              </div>
+
+            </div>
+          </article>
+
+          <!-- Posiciones -->
+          <article class="stats-card" aria-labelledby="standings-title">
+            <div class="stats-card-header standings-header">
+              <div>
+                <h2 id="standings-title">Posiciones 2026</h2>
+                <p>Clasificación por zonas de la LMB</p>
+              </div>
+
+              <div
+                class="zone-controls"
+                role="group"
+                aria-label="Seleccionar zona"
+              >
+                <button
+                  type="button"
+                  class="is-active"
+                  data-zone="north"
+                  aria-pressed="true"
+                >
+                  Zona Norte
+                </button>
+
+                <button
+                  type="button"
+                  data-zone="south"
+                  aria-pressed="false"
+                >
+                  Zona Sur
+                </button>
+              </div>
+            </div>
+
+            <div
+              class="standings-wrap"
+              tabindex="0"
+              role="region"
+              aria-label="Tabla de posiciones desplazable"
+            >
+              <table class="standings">
+                <caption id="standings-caption">
+                  Zona Norte · Temporada regular 2026
+                </caption>
+
+                <thead>
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Equipo</th>
+                    <th scope="col" title="Ganados">G</th>
+                    <th scope="col" title="Perdidos">P</th>
+                    <th scope="col">PCT</th>
+                    <th scope="col" title="Juegos detrás">DIF</th>
+                  </tr>
+                </thead>
+
+                <tbody data-standings-body>
+                  <!-- Filas cargadas desde el script inferior -->
+                </tbody>
+              </table>
+            </div>
+
+            <p class="stats-table-note">
+              G: ganados · P: perdidos · PCT: porcentaje ·
+              DIF: juegos detrás del líder de zona.
+            </p>
+          </article>
+        </div>
+
+        <!-- Columna secundaria -->
+        <div class="stats-sidebar">
+
+          <!-- Líderes -->
+          <article class="stats-card" aria-labelledby="leaders-title">
+            <div class="stats-card-header">
+              <div>
+                <h2 id="leaders-title">Líderes de la LMB</h2>
+                <p>Destacados individuales · Temporada 2026</p>
+              </div>
+            </div>
+
+            <div class="leaders-list">
+
+              <div class="leader-row">
+                <span class="leader-icon" aria-hidden="true">⚾</span>
+                <span class="leader-tag green">AVG</span>
+                <strong>.371</strong>
+                <span>Juan Carlos Gamboa</span>
+              </div>
+
+              <div class="leader-row">
+                <span class="leader-icon" aria-hidden="true">⚾</span>
+                <span class="leader-tag red">HR</span>
+                <strong>31</strong>
+                <span>Gabriel Cancel</span>
+              </div>
+
+              <div class="leader-row">
+                <span class="leader-icon" aria-hidden="true">⚾</span>
+                <span class="leader-tag blue">RBI</span>
+                <strong>95</strong>
+                <span>Gabriel Cancel</span>
+              </div>
+
+              <div class="leader-row">
+                <span class="leader-icon" aria-hidden="true">⚾</span>
+                <span class="leader-tag green">CA</span>
+                <strong>96</strong>
+                <span>Julián Ornelas</span>
+              </div>
+
+              <div class="leader-row">
+                <span class="leader-icon" aria-hidden="true">⚾</span>
+                <span class="leader-tag blue">BR</span>
+                <strong>40</strong>
+                <span>Randy Romero</span>
+              </div>
+
+            </div>
+          </article>
+
+          <!-- Sultanes -->
+          <article
+            class="stats-card sultanes-card"
+            aria-labelledby="sultanes-title"
+          >
+            <div class="stats-card-header">
+              <div>
+                <p class="sultanes-kicker">Equipo destacado</p>
+                <h2 id="sultanes-title">
+                  Sultanes de Monterrey
+                </h2>
+                <p>Temporada regular 2026</p>
+              </div>
+            </div>
+
+            <div class="sultanes-numbers">
+              <div>
+                <strong>49 – 44</strong>
+                <span>Ganados / Perdidos</span>
+              </div>
+
+              <div>
+                <strong>.527</strong>
+                <span>Porcentaje</span>
+              </div>
+
+              <div>
+                <strong>12.0</strong>
+                <span>Juegos detrás</span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <!-- Fuentes -->
+      <aside class="stats-source" aria-labelledby="source-title">
+        <div class="stats-source-content">
+          <span class="source-icon" aria-hidden="true">i</span>
+
+          <div>
+            <h2 id="source-title">Fuente de los datos</h2>
+
+            <p>
+              Liga Mexicana de Beisbol (LMB).
+              Corte de temporada regular:
+              <strong>7 de agosto de 2026</strong>.
+              Datos históricos de cierre, no en vivo.
+            </p>
+          </div>
+        </div>
+
+        <a
+          class="button source-button"
+          href="https://lmb.com.mx/posiciones"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Consultar LMB
+          <span aria-hidden="true">↗</span>
+        </a>
+      </aside>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>StrikeZone · Estadísticas</span>
+
+    <a class="text-link" href="historia-equipo.html">
+      Historia de Sultanes →
+    </a>
+  </footer>
+
+  <!-- Datos verificados del corte 2026 -->
+  <script>
+    (() => {
+      const north = [
+        ['Toros de Tijuana', 60, 31, '.659', '—'],
+        ['Caliente de Durango', 51, 42, '.548', '10.0'],
+        ['Sultanes de Monterrey', 49, 44, '.527', '12.0'],
+        ['Charros de Jalisco', 48, 45, '.516', '13.0'],
+        ['Acereros de Monclova', 48, 45, '.516', '13.0'],
+        ['Algodoneros de Unión Laguna', 46, 47, '.495', '15.0'],
+        ['Rieleros de Aguascalientes', 42, 47, '.472', '17.0'],
+        ['Saraperos de Saltillo', 38, 55, '.409', '23.0'],
+        ['Tecos de los Dos Laredos', 36, 57, '.387', '25.0'],
+        ['Dorados de Chihuahua', 35, 58, '.376', '26.0']
+      ];
+
+      const south = [
+        ['Diablos Rojos del México', 64, 29, '.688', '—'],
+        ['Olmecas de Tabasco', 54, 38, '.587', '9.5'],
+        ['Piratas de Campeche', 52, 41, '.559', '12.0'],
+        ['Pericos de Puebla', 50, 42, '.543', '13.5'],
+        ['Bravos de León', 50, 43, '.538', '14.0'],
+        ['Guerreros de Oaxaca', 48, 45, '.516', '16.0'],
+        ['El Águila de Veracruz', 43, 50, '.462', '21.0'],
+        ['Tigres de Quintana Roo', 43, 50, '.462', '21.0'],
+        ['Conspiradores de Querétaro', 35, 58, '.376', '29.0'],
+        ['Leones de Yucatán', 33, 58, '.363', '30.0']
+      ];
+
+      const body = document.querySelector(
+        '[data-standings-body]'
+      );
+
+      const caption = document.querySelector(
+        '#standings-caption'
+      );
+
+      const buttons = document.querySelectorAll(
+        '[data-zone]'
+      );
+
+      if (!body) return;
+
+      // Construir filas sin insertar datos como HTML.
+      function renderZone(zone) {
+        const data = zone === 'south' ? south : north;
+
+        const fragment = document.createDocumentFragment();
+
+        data.forEach((team, index) => {
+          const row = document.createElement('tr');
+
+          if (team[0] === 'Sultanes de Monterrey') {
+            row.classList.add('is-sultanes');
+          }
+
+          const position = document.createElement('th');
+          position.scope = 'row';
+          position.textContent = index + 1;
+
+          row.appendChild(position);
+
+          team.forEach((value, column) => {
+            const cell = document.createElement('td');
+
+            cell.textContent = value;
+
+            if (column === 0) {
+              cell.className = 'team-name';
+            }
+
+            if (column === 3) {
+              cell.className = 'pct';
+            }
+
+            row.appendChild(cell);
+          });
+
+          fragment.appendChild(row);
+        });
+
+        body.replaceChildren(fragment);
+
+        caption.textContent =
+          `Zona ${zone === 'south' ? 'Sur' : 'Norte'} · ` +
+          'Temporada regular 2026';
+
+        buttons.forEach(button => {
+          const active = button.dataset.zone === zone;
+
+          button.classList.toggle('is-active', active);
+          button.setAttribute('aria-pressed', String(active));
+        });
+      }
+
+      buttons.forEach(button => {
+        button.addEventListener('click', () => {
+          renderZone(button.dataset.zone);
+        });
+      });
+
+      renderZone('north');
+    })();
+  </script>
+
+  <!-- Scripts globales existentes -->
+  <script src="js/core/feedback.js"></script>
+  <script src="js/core/nav.js"></script>
+</body>
+</html>
