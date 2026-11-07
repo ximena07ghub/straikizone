@@ -1,5 +1,660 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>StrikeZone | Editor multimedia</title><link rel="stylesheet" href="css/base.css"><link rel="stylesheet" href="css/media.css"></head><body><header class="site-header" data-header><nav class="navbar container" aria-label="Navegación principal"><a class="brand" href="index.html"><img src="assets/brand/strikezone-logo.svg" alt="StrikeZone"></a><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="main-nav"><span></span><span></span><span class="sr-only">Abrir menú</span></button><div class="nav-links" id="main-nav" data-nav-menu><a class="" href="index.html">Inicio</a><a class="is-active" href="galeria.html">Galería</a><a class="" href="novedades.html">Novedades</a><a class="" href="historia-beisbol.html">Historia</a><a class="" href="estadisticas.html">Estadísticas</a><a class="" href="coleccion.html">Colección</a></div><div class="nav-actions"><a class="account-link" data-account-link href="login.html">Iniciar sesión</a></div></nav></header><main><section class="page-hero compact container"><p class="eyebrow">Galería · editor</p><h1 class="display" data-editor-title>Contenido StrikeZone</h1><p>El mismo editor procesa imágenes y video. No incluye blanco y negro, escala de grises, sepia, exposición ni colores invertidos.</p></section><section class="section-tight container"><div class="editor-layout"><article class="editor-stage-card"><div class="editor-stage"><img data-editor-image alt="Fuente editable"><video data-editor-video playsinline muted></video><canvas data-editor-canvas></canvas><span class="media-tag editor-badge" data-editor-kind>MEDIO EDITABLE</span></div><div class="video-tools" data-video-only><button class="button button-small" data-video-play type="button">Reproducir</button><button class="button button-small" data-record-video type="button">Guardar video filtrado</button><span class="record-state"><i></i>La exportación graba el lienzo filtrado.</span></div></article><aside class="editor-controls"><h2>Filtros</h2><p>Selecciona un efecto y regula su intensidad. Para video, el filtro se aplica cuadro por cuadro durante la reproducción y exportación.</p><div class="filter-grid"><button class="filter-option is-active" data-edit-filter="normal"><strong>Original</strong><span>sin cambios</span></button><button class="filter-option" data-edit-filter="blur"><strong>Desenfoque</strong><span>blur graduable</span></button><button class="filter-option" data-edit-filter="pixel"><strong>Pixelado</strong><span>bloques visibles</span></button><button class="filter-option" data-edit-filter="thermal"><strong>Cámara térmica</strong><span>mapa de intensidad</span></button><button class="filter-option" data-edit-filter="color"><strong>Ajuste de color</strong><span>saturación y contraste</span></button><button class="filter-option" data-edit-filter="pastel"><strong>Pastel</strong><span>acabado suave</span></button><button class="filter-option" data-edit-filter="soft"><strong>Suavizado</strong><span>detalle moderado</span></button><button class="filter-option" data-edit-filter="saturate"><strong>Alta saturación</strong><span>color intenso</span></button></div><div class="control-block"><label>Intensidad <span data-intensity-value>70%</span></label><input data-intensity type="range" min="15" max="100" value="70"></div><div class="editor-actions two"><button class="button button-green" data-save-media type="button">Guardar en perfil</button><button class="button" data-download-media type="button">Descargar</button></div><p class="status-message" data-editor-status>Preparando contenido…</p><a class="text-link" href="mis-fotos.html">Ver Mis medios →</a></aside></div></section></main><footer class="site-footer"><span>StrikeZone · Editor multimedia</span><a class="text-link" href="galeria.html">Volver a Galería →</a></footer><script src="js/core/feedback.js"></script>
-<script src="js/core/session.js"></script>
-<script src="js/media/photo-db.js"></script>
-<script src="js/media/editor.js"></script>
-<script src="js/core/nav.js"></script></body></html>
+
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>StrikeZone | Editor multimedia</title>
+
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/media.css">
+
+  <style>
+    /* Ajustes exclusivos del editor */
+    [hidden] {
+      display: none !important;
+    }
+
+    .sz-editor-page {
+      padding-top: 28px;
+      padding-bottom: 65px;
+    }
+
+    .sz-editor-heading {
+      margin-bottom: 24px;
+    }
+
+    .sz-editor-heading .eyebrow {
+      margin-bottom: 8px;
+      color: #286b28;
+      font-size: .75rem;
+      font-weight: 850;
+      letter-spacing: .1em;
+    }
+
+    .sz-editor-heading h1 {
+      margin: 0 0 8px;
+      color: #17231a;
+      font-size: clamp(1.8rem, 3vw, 2.7rem);
+      line-height: 1.1;
+    }
+
+    .sz-editor-heading p {
+      max-width: 780px;
+      margin: 0;
+      color: #566158;
+      line-height: 1.6;
+    }
+
+    .sz-editor-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.8fr) minmax(280px, .8fr);
+      align-items: start;
+      gap: 18px;
+    }
+
+    .sz-editor-preview-card,
+    .sz-editor-controls {
+      min-width: 0;
+      padding: 14px;
+      border: 1px solid #dce1d9;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 5px 18px rgba(18, 32, 20, .035);
+    }
+
+    /* El video no puede desbordar la vista previa */
+    .sz-editor-stage {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      max-height: 470px;
+      overflow: hidden;
+      border-radius: 6px;
+      background: #11251a;
+    }
+
+    .sz-editor-stage canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      max-width: 100%;
+      max-height: 470px;
+      object-fit: contain;
+      background: #11251a;
+    }
+
+    /* Imagen y video son fuentes, no vistas adicionales */
+    .sz-editor-stage > img[data-editor-image],
+    .sz-editor-stage > video[data-editor-video] {
+      display: none !important;
+    }
+
+    .sz-editor-badge {
+      position: absolute;
+      z-index: 2;
+      top: 12px;
+      left: 12px;
+      padding: 7px 10px;
+      border-radius: 4px;
+      background: rgba(12, 28, 18, .88);
+      color: #fff;
+      font-size: .67rem;
+      font-weight: 850;
+      letter-spacing: .04em;
+      pointer-events: none;
+    }
+
+    /* Controles de video siempre debajo de la vista */
+    .sz-video-panel {
+      display: grid;
+      gap: 14px;
+      padding: 16px 2px 4px;
+    }
+
+    .sz-video-panel:not([hidden]) {
+      display: grid !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+    }
+
+    .sz-video-mode {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sz-video-mode button {
+      min-height: 40px;
+      padding: 9px 16px;
+      border: 1px solid #cdd7cc;
+      border-radius: 5px;
+      background: #fff;
+      color: #17231a;
+      font-size: .83rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .sz-video-mode button.is-active {
+      border-color: #286b28;
+      background: #286b28;
+      color: #fff;
+    }
+
+    .sz-video-progress {
+      display: grid;
+      grid-template-columns: 44px minmax(0, 1fr) 44px;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .sz-video-progress time {
+      color: #4f5b50;
+      font-size: .77rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .sz-video-progress input {
+      width: 100%;
+      min-width: 0;
+      accent-color: #286b28;
+      cursor: pointer;
+    }
+
+    .sz-video-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      align-items: center;
+    }
+
+    .sz-editor-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 10px 16px;
+      border: 1px solid #cdd7cc;
+      border-radius: 5px;
+      background: #fff;
+      color: #17231a;
+      font: inherit;
+      font-size: .83rem;
+      font-weight: 800;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .sz-editor-button.is-green {
+      border-color: #286b28;
+      background: #286b28;
+      color: #fff;
+    }
+
+    .sz-editor-button.is-dark {
+      border-color: #17231a;
+      background: #17231a;
+      color: #fff;
+    }
+
+    .sz-editor-button:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+    }
+
+    .sz-editor-note {
+      margin: 0;
+      color: #647064;
+      font-size: .77rem;
+      line-height: 1.55;
+    }
+
+    /* Panel de filtros */
+    .sz-editor-controls {
+      padding: 21px;
+    }
+
+    .sz-editor-controls h2 {
+      margin: 0 0 8px;
+      color: #17231a;
+      font-size: 1.35rem;
+    }
+
+    .sz-editor-description {
+      margin: 0 0 20px;
+      color: #657066;
+      font-size: .83rem;
+      line-height: 1.6;
+    }
+
+    .sz-filter-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .sz-filter-option {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+      min-height: 65px;
+      padding: 10px;
+      border: 1px solid #d9dfd6;
+      border-radius: 6px;
+      background: #f9faf7;
+      color: #17231a;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .sz-filter-option strong {
+      font-size: .78rem;
+      line-height: 1.25;
+    }
+
+    .sz-filter-option span {
+      color: #667166;
+      font-size: .7rem;
+      line-height: 1.35;
+    }
+
+    .sz-filter-option.is-active {
+      border-color: #286b28;
+      background: #edf4e9;
+    }
+
+    .sz-intensity {
+      margin-top: 22px;
+    }
+
+    .sz-intensity label {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+      color: #17231a;
+      font-size: .83rem;
+      font-weight: 800;
+    }
+
+    .sz-intensity input {
+      width: 100%;
+      accent-color: #286b28;
+    }
+
+    .sz-editor-save-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 23px;
+    }
+
+    .sz-editor-status {
+      min-height: 22px;
+      margin: 12px 0;
+      color: #425746;
+      font-size: .79rem;
+      line-height: 1.5;
+    }
+
+    .sz-editor-controls .text-link {
+      display: inline-block;
+      margin-top: 6px;
+    }
+
+    .sz-video-mode button:focus-visible,
+    .sz-editor-button:focus-visible,
+    .sz-filter-option:focus-visible,
+    .sz-video-progress input:focus-visible {
+      outline: 3px solid rgba(40, 107, 40, .3);
+      outline-offset: 3px;
+    }
+
+    @media (max-width: 950px) {
+      .sz-editor-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sz-editor-stage,
+      .sz-editor-stage canvas {
+        max-height: 540px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .sz-editor-page {
+        padding-top: 18px;
+      }
+
+      .sz-editor-preview-card {
+        padding: 9px;
+      }
+
+      .sz-editor-controls {
+        padding: 16px;
+      }
+
+      .sz-editor-stage {
+        border-radius: 4px;
+      }
+
+      .sz-video-panel {
+        gap: 12px;
+        padding: 13px 2px 4px;
+      }
+
+      .sz-video-progress {
+        grid-template-columns: 38px minmax(0, 1fr) 38px;
+        gap: 7px;
+      }
+
+      .sz-video-actions .sz-editor-button {
+        flex: 1;
+      }
+
+      .sz-editor-save-actions {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .sz-filter-grid,
+      .sz-editor-save-actions {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Navegación global -->
+  <header class="site-header" data-header>
+    <nav class="navbar container" aria-label="Navegación principal">
+      <a class="brand" href="index.html">
+        <img src="assets/brand/strikezone-logo.svg" alt="StrikeZone">
+      </a>
+
+      <button
+        class="nav-toggle"
+        type="button"
+        data-nav-toggle
+        aria-expanded="false"
+        aria-controls="main-nav"
+      >
+        <span></span>
+        <span></span>
+        <span class="sr-only">Abrir menú</span>
+      </button>
+
+      <div class="nav-links" id="main-nav" data-nav-menu>
+        <a href="index.html">Inicio</a>
+        <a href="galeria.html" class="is-active">Galería</a>
+        <a href="novedades.html">Novedades</a>
+        <a href="historia-beisbol.html">Historia</a>
+        <a href="estadisticas.html">Estadísticas</a>
+        <a href="coleccion.html">Colección</a>
+      </div>
+
+      <div class="nav-actions">
+        <a class="account-link" data-account-link href="login.html">
+          Iniciar sesión
+        </a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="container sz-editor-page">
+    <div class="sz-editor-heading">
+      <p class="eyebrow">GALERÍA · EDITOR MULTIMEDIA</p>
+      <h1 data-editor-title>Editor StrikeZone</h1>
+      <p>
+        Reproduce, compara y aplica filtros a tus imágenes y videos.
+        Guarda el resultado en Mis Medios.
+      </p>
+    </div>
+
+    <div class="sz-editor-layout">
+
+      <!-- Vista previa -->
+      <section class="sz-editor-preview-card" aria-label="Vista previa">
+        <div class="sz-editor-stage">
+          <img data-editor-image alt="" hidden>
+
+          <video
+            data-editor-video
+            playsinline
+            preload="metadata"
+            hidden
+          ></video>
+
+          <canvas
+            data-editor-canvas
+            aria-label="Vista previa multimedia"
+          ></canvas>
+
+          <span class="sz-editor-badge" data-editor-kind>
+            MEDIO EDITABLE
+          </span>
+        </div>
+
+        <!-- Controles de reproducción -->
+        <div class="sz-video-panel" data-video-only hidden>
+
+          <div
+            class="sz-video-mode"
+            role="group"
+            aria-label="Comparar video"
+          >
+            <button
+              type="button"
+              class="is-active"
+              data-video-view="original"
+              aria-pressed="true"
+            >
+              Original
+            </button>
+
+            <button
+              type="button"
+              data-video-view="filtered"
+              aria-pressed="false"
+            >
+              Con filtro
+            </button>
+          </div>
+
+          <div class="sz-video-progress">
+            <time data-video-current>00:00</time>
+
+            <input
+              type="range"
+              min="0"
+              max="1000"
+              value="0"
+              step="1"
+              data-video-seek
+              aria-label="Progreso del video"
+            >
+
+            <time data-video-duration>00:00</time>
+          </div>
+
+          <div class="sz-video-actions">
+            <button
+              class="sz-editor-button is-green"
+              type="button"
+              data-video-play
+            >
+              Reproducir
+            </button>
+
+            <button
+              class="sz-editor-button"
+              type="button"
+              data-record-video
+            >
+              Guardar video con filtro
+            </button>
+          </div>
+
+          <p class="sz-editor-note">
+            Cambiar entre Original y Con filtro no reinicia el video.
+            La exportación se realiza en formato WebM sin audio.
+          </p>
+        </div>
+      </section>
+
+      <!-- Filtros -->
+      <aside class="sz-editor-controls">
+        <h2>Filtros</h2>
+
+        <p class="sz-editor-description">
+          Selecciona un efecto y ajusta su intensidad.
+          En los videos podrás observar los cambios
+          mientras se reproducen.
+        </p>
+
+        <div class="sz-filter-grid">
+          <button
+            class="sz-filter-option is-active"
+            type="button"
+            data-edit-filter="normal"
+          >
+            <strong>Original</strong>
+            <span>Sin cambios</span>
+          </button>
+
+          <button
+            class="sz-filter-option"
+            type="button"
+            data-edit-filter="blur"
+          >
+            <strong>Desenfoque</strong>
+            <span>Suave o intenso</span>
+          </button>
+
+          <button
+            class="sz-filter-option"
+            type="button"
+            data-edit-filter="pixel"
+          >
+            <strong>Pixelado</strong>
+            <span>Bloques visibles</span>
+          </button>
+
+          <button
+            class="sz-filter-option"
+            type="button"
+            data-edit-filter="thermal"
+          >
+            <strong>Cámara térmica</strong>
+            <span>Mapa de intensidad</span>
+          </button>
+
+          <button
+            class="sz-filter-option"
+            type="button"
+            data-edit-filter="color"
+          >
+            <strong>Ajuste de color</strong>
+            <span>Color y contraste</span>
+          </button>
+
+          <button
+            class="sz-filter-option"
+            type="button"
+            data-edit-filter="pastel"
+          >
+            <strong>Pastel</strong>
+            <span>Acabado suave</span>
+          </button>
+
+          <button
+            class="sz-filter-option"
+            type="button"
+            data-edit-filter="soft"
+          >
+            <strong>Suavizado</strong>
+            <span>Detalle moderado</span>
+          </button>
+
+          <button
+            class="sz-filter-option"
+            type="button"
+            data-edit-filter="saturate"
+          >
+            <strong>Alta saturación</strong>
+            <span>Color intenso</span>
+          </button>
+        </div>
+
+        <div class="sz-intensity">
+          <label for="filter-intensity">
+            <span>Intensidad</span>
+            <span data-intensity-value>70%</span>
+          </label>
+
+          <input
+            id="filter-intensity"
+            type="range"
+            min="15"
+            max="100"
+            value="70"
+            data-intensity
+          >
+        </div>
+
+        <div class="sz-editor-save-actions">
+          <button
+            class="sz-editor-button is-green"
+            type="button"
+            data-save-media
+          >
+            Guardar en perfil
+          </button>
+
+          <button
+            class="sz-editor-button is-dark"
+            type="button"
+            data-download-media
+          >
+            Descargar
+          </button>
+        </div>
+
+        <p
+          class="sz-editor-status"
+          data-editor-status
+          role="status"
+          aria-live="polite"
+        >
+          Preparando contenido…
+        </p>
+
+        <a class="text-link" href="mis-fotos.html">
+          Ver Mis Medios →
+        </a>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <span>StrikeZone · Editor multimedia</span>
+    <a class="text-link" href="galeria.html">
+      Volver a Galería →
+    </a>
+  </footer>
+
+  <script src="js/core/feedback.js"></script>
+  <script src="js/core/session.js"></script>
+  <script src="js/media/photo-db.js"></script>
+  <script src="js/media/editor.js"></script>
+  <script src="js/core/nav.js"></script>
+</body>
+</html>
