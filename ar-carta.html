@@ -29,10 +29,14 @@
   <main id="ar-container" class="ar-camera"
         aria-label="Experiencia de realidad aumentada">
 
-    <!-- Barra superior -->
+    <!-- Regreso con origen controlado -->
     <div class="ar-topbar">
-      <a class="ar-back" href="escaner.html"
-         aria-label="Volver al escáner">←</a>
+      <a
+        class="ar-back"
+        data-ar-back
+        href="coleccion.html"
+        aria-label="Volver a la colección"
+      >←</a>
 
       <div class="ar-heading">
         <span data-ar-category>STRIKEZONE</span>
@@ -45,7 +49,6 @@
       </a>
     </div>
 
-    <!-- Guía visual -->
     <div class="ar-reticle" aria-hidden="true">
       <i></i><i></i><i></i><i></i>
     </div>
@@ -55,7 +58,7 @@
       Listo para iniciar
     </div>
 
-    <!-- Inicio de la experiencia existente -->
+    <!-- Inicio AR original -->
     <section class="ar-start" data-ar-start-panel>
       <div class="ar-start-card">
         <span class="ar-kicker">
@@ -70,9 +73,11 @@
         </p>
 
         <div class="ar-preview-row">
-          <img data-target-preview
-               src="assets/brand/strikezone-logo.svg"
-               alt="Vista previa del marcador QR">
+          <img
+            data-target-preview
+            src="assets/brand/strikezone-logo.svg"
+            alt="Vista previa del marcador QR"
+          >
 
           <div>
             <small>Modelo actual</small>
@@ -89,14 +94,10 @@
           Activar cámara AR
         </button>
 
-        <p class="ar-note">
-          El modelo se muestra cuando la cámara reconoce
-          su marcador. Las funciones originales se conservan.
-        </p>
+
       </div>
     </section>
 
-    <!-- Ayuda de seguimiento -->
     <section class="ar-help" data-ar-help hidden>
       <strong>Apunta al QR del modelo</strong>
       <span>
@@ -108,7 +109,7 @@
       1 dedo: gira · 2 dedos: mueve y zoom · toque: animar
     </div>
 
-    <!-- Información -->
+    <!-- Información existente -->
     <section class="ar-info-panel" data-info-panel hidden>
       <button type="button" data-info-close
               aria-label="Cerrar información">×</button>
@@ -127,11 +128,13 @@
       </small>
     </section>
 
-    <!-- Controles originales + captura -->
-    <nav class="ar-controls"
-         aria-label="Controles del modelo"
-         data-ar-controls hidden>
-
+    <!-- Controles AR intactos -->
+    <nav
+      class="ar-controls"
+      aria-label="Controles del modelo"
+      data-ar-controls
+      hidden
+    >
       <button type="button" data-jump>
         <span>▶</span>Animar
       </button>
@@ -157,18 +160,18 @@
       </button>
     </nav>
 
-    <!-- Confirmación de captura -->
-    <div class="ar-capture-message"
-         data-capture-message
-         role="status" aria-live="polite"
-         hidden>
-    </div>
+    <!-- Confirmación de captura existente -->
+    <div
+      class="ar-capture-message"
+      data-capture-message
+      role="status"
+      aria-live="polite"
+      hidden
+    ></div>
 
-    <!-- Acceso al login -->
     <div class="ar-capture-login" data-capture-login hidden>
       <p>
         Inicia sesión para guardar capturas AR
-        en Mis Medios.
       </p>
 
       <a href="login.html" data-capture-login-link>
@@ -180,7 +183,7 @@
       </button>
     </div>
 
-    <!-- Error AR existente -->
+    <!-- Errores AR existentes -->
     <div class="ar-error" data-ar-error hidden>
       <strong>No se pudo iniciar la experiencia AR.</strong>
 
@@ -194,17 +197,29 @@
     </div>
   </main>
 
-  <!-- Catálogo y almacenamiento existentes -->
+  <!-- Scripts existentes -->
   <script src="js/ar/cards.js"></script>
   <script src="js/collection/rewards.js"></script>
   <script src="js/media/photo-db.js"></script>
 
-  <!-- Información inicial -->
   <script>
     (() => {
       const params = new URLSearchParams(location.search);
 
-      const id = (params.get('card') || '').trim().toLowerCase();
+      // Admitir únicamente el origen scanner.
+      const backLink = document.querySelector('[data-ar-back]');
+
+      if (backLink && params.get('from') === 'scanner') {
+        backLink.href = 'escaner.html';
+        backLink.setAttribute(
+          'aria-label',
+          'Volver al escáner AR'
+        );
+      }
+
+      const id =
+        (params.get('card') || '').trim().toLowerCase();
+
       const modelKey =
         (params.get('model') || '').trim().toLowerCase();
 
@@ -249,9 +264,7 @@
       );
 
       if (preview) {
-        preview.src =
-          card.targetImage || card.markerImage;
-
+        preview.src = card.targetImage || card.markerImage;
         preview.alt = `Marcador QR de ${name}`;
       }
 
@@ -266,7 +279,6 @@
         print.hidden = modelMode;
       }
 
-      // No atribuir una carta al modo de modelo compartido.
       set(
         '[data-info-team]',
         modelMode
@@ -280,10 +292,7 @@
     })();
   </script>
 
-  <!-- Visor AR original sin reemplazar -->
   <script type="module" src="js/ar/card-viewer.js"></script>
-
-  <!-- Captura -->
   <script src="js/ar/capture.js"></script>
 </body>
 </html>

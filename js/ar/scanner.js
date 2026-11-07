@@ -1,12 +1,3 @@
-(() => {
-  const start=document.querySelector('[data-scan-start]'),stop=document.querySelector('[data-scan-stop]'),result=document.querySelector('[data-scan-result]');let scanner=null,active=false;
-  const allowed=['ar-pelota.html','ar-estadio.html','ar-premio.html','ar-carta.html'];
-  function message(t){result.textContent=t}
-  function handle(decoded){let target='',destination='';try{const u=new URL(decoded,location.href);target=u.pathname.split('/').pop();destination=target+(u.search||'')}catch{target=decoded.split('?')[0].split('/').pop();destination=decoded}if(allowed.includes(target)){message('Código reconocido. Abriendo experiencia…');stopScan().finally(()=>location.href=destination)}else{message('Código leído, pero no corresponde a una experiencia StrikeZone.') }}
-  async function startScan(){if(active)return;if(typeof Html5Qrcode==='undefined'){message('El lector no pudo cargarse. Usa la cámara del teléfono sobre uno de los QR de StrikeZone.');return}scanner=new Html5Qrcode('reader');try{await scanner.start({facingMode:'environment'},{fps:10,qrbox:{width:250,height:250}},handle,()=>{});active=true;start.disabled=true;stop.disabled=false;message('Cámara activa. Coloca el QR dentro del recuadro.')}catch{message('No se pudo abrir la cámara. Revisa el permiso del navegador.')}}
-  async function stopScan(){if(scanner&&active){try{await scanner.stop();await scanner.clear()}catch{}active=false;start.disabled=false;stop.disabled=true}}
-  start?.addEventListener('click',startScan);stop?.addEventListener('click',stopScan);window.addEventListener('beforeunload',stopScan);
-})();
 
 (() => {
   const startBtn = document.querySelector('[data-scan-start]');
@@ -34,7 +25,7 @@
     if (result) result.textContent = text;
   }
 
-  // Comprobar el dominio de un QR.
+  // Validar el origen del QR.
   function trusted(url) {
     return (
       url.origin === location.origin ||
@@ -45,7 +36,7 @@
     );
   }
 
-  // Evitar parámetros duplicados o desconocidos.
+  // Evitar parámetros duplicados o vacíos.
   function singleParam(url, key) {
     const values = url.searchParams.getAll(key);
 
@@ -54,7 +45,7 @@
       : null;
   }
 
-  // Resolver exclusivamente identificadores del catálogo.
+  // Resolver únicamente identificadores del catálogo.
   function resolveQR(decoded) {
     let url;
 
@@ -74,7 +65,7 @@
 
     const page = url.pathname.split('/').pop();
 
-    // Conservar las experiencias AR antiguas.
+    // Conservar experiencias AR antiguas.
     if (legacyPages.has(page)) {
       if (url.search || url.hash) {
         return {
@@ -92,7 +83,9 @@
     }
 
     if (url.hash) {
-      return { error: 'El enlace AR contiene un fragmento inválido.' };
+      return {
+        error: 'El enlace AR contiene un fragmento inválido.'
+      };
     }
 
     const keys = [...url.searchParams.keys()];
@@ -109,46 +102,56 @@
     const cardId = singleParam(url, 'card');
     const modelKey = singleParam(url, 'model');
 
-    // Identificador único de carta.
+    // Carta identificada expresamente.
     if (cardId) {
       const card = cards[cardId];
 
       if (!card) {
-        return { error: 'La carta del QR no está registrada.' };
+        return {
+          error: 'La carta del QR no está registrada.'
+        };
       }
 
       return {
-        href: `ar-carta.html?card=${encodeURIComponent(cardId)}`,
+        href:
+          `ar-carta.html?card=${encodeURIComponent(cardId)}` +
+          '&from=scanner',
         label: card.name
       };
     }
 
     if (!modelKey || !models[modelKey]) {
-      return { error: 'El modelo del QR no está registrado.' };
+      return {
+        error: 'El modelo del QR no está registrado.'
+      };
     }
 
     const model = models[modelKey];
 
-    // No elegir jugadores arbitrariamente.
+    // No asignar arbitrariamente un modelo compartido.
     const related = Object.values(cards).filter(
       card => card.modelKey === modelKey
     );
 
     if (related.length === 1) {
       return {
-        href: `ar-carta.html?card=${encodeURIComponent(related[0].id)}`,
+        href:
+          `ar-carta.html?card=${encodeURIComponent(related[0].id)}` +
+          '&from=scanner',
         label: related[0].name
       };
     }
 
     return {
-      href: `ar-carta.html?model=${encodeURIComponent(modelKey)}`,
+      href:
+        `ar-carta.html?model=${encodeURIComponent(modelKey)}` +
+        '&from=scanner',
       label: model.title || modelKey,
       shared: related.length > 1
     };
   }
 
-  // Detener cámara y liberar recursos.
+  // Detener la cámara y liberar recursos.
   async function stopScan() {
     if (scanner) {
       try {
@@ -171,7 +174,7 @@
     if (stopBtn) stopBtn.disabled = true;
   }
 
-  // Abrir el visor existente.
+  // Abrir la experiencia existente.
   async function onDetected(decoded) {
     if (processing) return;
 
@@ -194,7 +197,7 @@
     location.href = resolved.href;
   }
 
-  // Solicitar cámara tras interacción.
+  // Pedir permiso únicamente después del clic.
   async function startScan() {
     if (active || processing) return;
 
