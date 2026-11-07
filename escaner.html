@@ -1,3 +1,124 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>StrikeZone | Escáner</title><link rel="stylesheet" href="css/base.css"><link rel="stylesheet" href="css/ar/hub.css"></head><body>
-<header class="site-header" data-header><nav class="navbar container" aria-label="Navegación principal"><a class="brand" href="index.html"><img src="assets/brand/strikezone-logo.svg" alt="StrikeZone"></a><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="main-nav"><span></span><span></span><span class="sr-only">Abrir menú</span></button><div class="nav-links" id="main-nav" data-nav-menu><a class="" href="index.html">Inicio</a><a class="" href="galeria.html">Galería</a><a class="" href="novedades.html">Novedades</a><a class="" href="historia-beisbol.html">Historia</a><a class="" href="estadisticas.html">Estadísticas</a><a class="is-active" href="coleccion.html">Colección</a></div><div class="nav-actions"><a class="account-link" data-account-link href="login.html">Iniciar sesión</a></div></nav></header>
-<main><section class="page-hero container"><p class="eyebrow">Escáner StrikeZone</p><h1 class="display">Escanea un código AR</h1><p>Coloca el código de la pelota o del estadio dentro del recuadro. Cuando sea reconocido, la experiencia se abrirá automáticamente.</p></section><section class="section container"><div class="scanner-shell"><article class="scanner-card"><div id="reader" class="scanner-reader"></div><div class="scanner-actions"><button class="button button-green" data-scan-start type="button">Activar cámara</button><button class="button" data-scan-stop type="button" disabled>Detener</button></div><div class="scan-result" data-scan-result>Presiona “Activar cámara” para comenzar.</div></article><aside class="scanner-info"><p class="eyebrow">También puedes abrirlas directo</p><h2>Experiencias disponibles</h2><p>Si no tienes un código impreso a la mano, entra a cualquiera de las experiencias desde aquí.</p><div class="model-grid"><a class="model-link ui-card" href="ar-pelota.html"><strong>⚾ Pelota AR</strong><span>Modelo 3D y rebote</span></a><a class="model-link ui-card" href="ar-estadio.html"><strong>🏟️ Estadio AR</strong><span>Maqueta 3D</span></a></div></aside></div></section></main><footer class="site-footer container"><span>StrikeZone · Escáner AR</span><a href="ar.html">Volver a AR →</a></footer><script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script><script src="js/ar/scanner.js"></script><script src="js/core/feedback.js"></script><script src="js/core/nav.js"></script></body></html>
+
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>StrikeZone | Escanear AR</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/ar/hub.css">
+</head>
+<body>
+  <header class="site-header" data-header>
+    <nav class="navbar container" aria-label="Navegación principal">
+      <a class="brand" href="index.html">
+        <img src="assets/brand/strikezone-logo.svg" alt="StrikeZone">
+      </a>
+
+      <button class="nav-toggle" type="button"
+              data-nav-toggle aria-expanded="false"
+              aria-controls="main-nav">
+        <span></span><span></span>
+        <span class="sr-only">Abrir menú</span>
+      </button>
+
+      <div class="nav-links" id="main-nav" data-nav-menu>
+        <a href="index.html">Inicio</a>
+        <a href="galeria.html">Galería</a>
+        <a href="novedades.html">Novedades</a>
+        <a href="historia-beisbol.html">Historia</a>
+        <a href="estadisticas.html">Estadísticas</a>
+        <a class="is-active" href="coleccion.html">Colección</a>
+      </div>
+
+      <div class="nav-actions">
+        <a class="account-link" data-account-link href="login.html">
+          Iniciar sesión
+        </a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="page-hero compact container">
+      <p class="eyebrow">StrikeZone · Realidad aumentada</p>
+      <h1 class="display">ESCANEAR AR</h1>
+      <p>
+        Apunta a un QR de StrikeZone para identificar su
+        experiencia y abrir el visor correspondiente.
+      </p>
+    </section>
+
+    <section class="section-tight container">
+      <div class="scanner-shell">
+        <article class="scanner-card">
+          <!-- Lector original -->
+          <div id="reader" class="scanner-reader"
+               aria-label="Vista de cámara para escanear QR"></div>
+
+          <div class="scanner-actions">
+            <button class="button button-green" type="button"
+                    data-scan-start>
+              Activar cámara
+            </button>
+
+            <button class="button" type="button"
+                    data-scan-stop disabled>
+              Detener cámara
+            </button>
+          </div>
+
+          <p class="scan-result" data-scan-result
+             role="status" aria-live="polite">
+            Presiona Activar cámara y permite el acceso.
+          </p>
+
+          <p class="source-note">
+            Si el QR identifica solamente un modelo compartido,
+            se abrirá ese modelo sin atribuirlo a un jugador.
+          </p>
+        </article>
+
+        <aside class="scanner-info">
+          <p class="eyebrow">Experiencias existentes</p>
+          <h2>También puedes abrirlas directamente.</h2>
+          <p>
+            El escáner es una entrada adicional.
+            Las experiencias actuales siguen disponibles.
+          </p>
+
+          <div class="model-grid">
+            <a class="model-link ui-card" href="ar-pelota.html">
+              <strong>Pelota AR</strong>
+              <span>Modelo 3D y animación</span>
+            </a>
+
+            <a class="model-link ui-card" href="ar-estadio.html">
+              <strong>Estadio AR</strong>
+              <span>Maqueta tridimensional</span>
+            </a>
+
+            <a class="model-link ui-card" href="coleccion.html">
+              <strong>Cartas AR</strong>
+              <span>Modelos de los jugadores</span>
+            </a>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer container">
+    <span>StrikeZone · Escáner AR</span>
+    <a class="text-link" href="coleccion.html">
+      Volver a colección →
+    </a>
+  </footer>
+
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script src="js/ar/cards.js"></script>
+  <script src="js/ar/scanner.js"></script>
+  <script src="js/core/feedback.js"></script>
+  <script src="js/core/nav.js"></script>
+</body>
+</html>

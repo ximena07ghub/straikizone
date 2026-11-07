@@ -1,2 +1,365 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>StrikeZone | Novedades</title><link rel="stylesheet" href="css/base.css"><link rel="stylesheet" href="css/simple.css"></head><body><header class="site-header" data-header><nav class="navbar container" aria-label="Navegación principal"><a class="brand" href="index.html"><img src="assets/brand/strikezone-logo.svg" alt="StrikeZone"></a><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="main-nav"><span></span><span></span><span class="sr-only">Abrir menú</span></button><div class="nav-links" id="main-nav" data-nav-menu><a class="" href="index.html">Inicio</a><a class="" href="galeria.html">Galería</a><a class="is-active" href="novedades.html">Novedades</a><a class="" href="historia-beisbol.html">Historia</a><a class="" href="estadisticas.html">Estadísticas</a><a class="" href="coleccion.html">Colección</a></div><div class="nav-actions"><a class="account-link" data-account-link href="login.html">Iniciar sesión</a></div></nav></header><main><section class="page-hero container"><p class="eyebrow">Zona Norte · módulo editorial</p><h1 class="display">Novedades</h1><p>Una lectura más amplia y jerarquizada del contenido de temporada: evento destacado, próximos encuentros y notas principales. Esta sección se mantiene independiente de Galería y Colección.</p></section><section class="section-tight container"><div class="news-spotlight"><article class="spotlight-main ui-card"><p class="eyebrow" style="color:#b8cf78">Partido destacado</p><h2 class="display">Serie del Norte</h2><div class="scoreboard"><div class="team">SULTANES<br><small>Monterrey</small></div><div class="vs">VS</div><div class="team">TOROS<br><small>Tijuana</small></div></div><p>El bloque destacado prioriza el enfrentamiento principal y concentra fecha, contexto y estado del partido en una sola pieza visual.</p><a class="button button-ghost" href="estadisticas.html">Consultar estadísticas</a></article><div class="spotlight-side"><article class="news-mini ui-card"><p class="eyebrow">Temporada regular</p><h3>Toros cierra con 60 triunfos</h3><p>El corte estadístico usado por el proyecto coloca a Tijuana con la mejor marca de la Zona Norte.</p><a class="text-link" href="estadisticas.html">Ver tabla →</a></article><article class="news-mini ui-card"><p class="eyebrow">Monterrey</p><h3>Sultanes y su recorrido norteño</h3><p>El módulo histórico del equipo explica su presencia, identidad y trayectoria sin mezclarlo con contenido de colección.</p><a class="text-link" href="historia-equipo.html">Historia de Sultanes →</a></article></div></div></section><section class="section container"><div class="section-heading"><div><p class="eyebrow">Próximos encuentros</p><h2 class="display">Agenda visual.</h2></div><p>Tarjetas compactas para leer rival, fecha y hora sin saturar la portada de novedades.</p></div><div class="upcoming-grid"><article class="match-card ui-card"><div class="match-card-top"><span>Jornada</span><span>18:30</span></div><div class="match-pair"><div class="match-team">Sultanes</div><span class="match-vs">VS</span><div class="match-team">Acereros</div></div><span class="kicker">Próximo juego</span></article><article class="match-card ui-card"><div class="match-card-top"><span>Jornada</span><span>19:00</span></div><div class="match-pair"><div class="match-team">Toros</div><span class="match-vs">VS</span><div class="match-team">Charros</div></div><span class="kicker">Próximo juego</span></article><article class="match-card ui-card"><div class="match-card-top"><span>Jornada</span><span>19:30</span></div><div class="match-pair"><div class="match-team">Caliente</div><span class="match-vs">VS</span><div class="match-team">Algodoneros</div></div><span class="kicker">Próximo juego</span></article></div></section><section class="section container"><div class="section-heading"><div><p class="eyebrow">Últimas notas</p><h2 class="display">Lo más relevante primero.</h2></div></div><div class="news-list-layout"><article class="news-feature ui-card"><div class="news-feature-visual"></div><div class="news-feature-copy"><p class="eyebrow">Zona Norte</p><h3>Sultanes mantiene presencia competitiva</h3><p>La estructura de novedades ahora separa una noticia principal de notas secundarias y enlaces de consulta, siguiendo la organización de la referencia proporcionada sin copiar su estilo.</p><a class="text-link" href="historia-equipo.html">Leer contexto histórico →</a></div></article><aside class="more-news ui-card"><h3>Más noticias</h3><a href="estadisticas.html">Tabla de posiciones <span>→</span></a><a href="historia-equipo.html">Historia de Monterrey <span>→</span></a><a href="historia-beisbol.html">Historia del béisbol <span>→</span></a></aside></div></section></main><footer class="site-footer"><span>StrikeZone · Novedades</span><a class="text-link" href="estadisticas.html">Ver estadísticas →</a></footer><script src="js/core/feedback.js"></script>
-<script src="js/core/nav.js"></script></body></html>
+
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>StrikeZone | Novedades MLB</title>
+
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/simple.css">
+</head>
+
+<body>
+  <!-- Navegación existente -->
+  <header class="site-header" data-header>
+    <nav class="navbar container" aria-label="Navegación principal">
+      <a class="brand" href="index.html">
+        <img src="assets/brand/strikezone-logo.svg" alt="StrikeZone">
+      </a>
+
+      <button
+        class="nav-toggle"
+        type="button"
+        data-nav-toggle
+        aria-expanded="false"
+        aria-controls="main-nav"
+      >
+        <span></span>
+        <span></span>
+        <span class="sr-only">Abrir menú</span>
+      </button>
+
+      <div class="nav-links" id="main-nav" data-nav-menu>
+        <a href="index.html">Inicio</a>
+        <a href="galeria.html">Galería</a>
+        <a class="is-active" href="novedades.html"
+           aria-current="page">Novedades</a>
+        <a href="historia-beisbol.html">Historia</a>
+        <a href="estadisticas.html">Estadísticas</a>
+        <a href="coleccion.html">Colección</a>
+      </div>
+
+      <div class="nav-actions">
+        <a
+          class="account-link"
+          data-account-link
+          href="login.html"
+        >
+          Iniciar sesión
+        </a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Encabezado editorial -->
+    <section class="news-hero container">
+      <p class="eyebrow">StrikeZone · Grandes Ligas</p>
+
+      <h1 class="display">NOVEDADES</h1>
+
+      <span class="news-hero-rule" aria-hidden="true"></span>
+
+      <p class="news-hero-description">
+        Noticias, movimientos y acontecimientos recientes de MLB.
+      </p>
+
+      <p class="news-updated">
+        <span aria-hidden="true">●</span>
+        Actualizado: <time datetime="2026-11-06">6 de noviembre de 2026</time>
+      </p>
+    </section>
+
+    <!-- Portada editorial -->
+    <section class="news-section container" aria-labelledby="cover-title">
+      <div class="news-section-heading">
+        <div>
+          <p class="eyebrow">Panorama MLB</p>
+          <h2 class="display" id="cover-title">
+            En primera plana.
+          </h2>
+        </div>
+        <p>
+          Noticias verificadas de la temporada baja.
+          Las imágenes son ilustrativas.
+        </p>
+      </div>
+
+      <div class="news-spotlight">
+
+        <!-- Noticia principal -->
+        <article class="news-lead">
+          <a
+            class="news-lead-link"
+            href="https://www.mlb.com/news/mlb-rumors-trades-and-signings"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Leer en MLB.com el panorama de agencia libre"
+          >
+            <div class="news-lead-image">
+              <img
+                src="assets/home/equipo.jpg"
+                alt="Fotografía editorial de un equipo de béisbol"
+                loading="lazy"
+              >
+              <span class="news-image-note">
+                Imagen editorial representativa
+              </span>
+            </div>
+
+            <div class="news-lead-copy">
+              <div class="news-meta">
+                <span class="news-category">MERCADO MLB</span>
+                <time datetime="2026-11-05">5 NOV 2026</time>
+              </div>
+
+              <h3>
+                Arranca el mercado de invierno:
+                los movimientos que marcarán MLB en 2027
+              </h3>
+
+              <p>
+                La temporada baja abre una etapa de negociaciones,
+                decisiones contractuales y posibles incorporaciones
+                que comenzarán a definir las plantillas del próximo año.
+              </p>
+
+              <span class="news-read">
+                Leer noticia original ↗
+              </span>
+            </div>
+          </a>
+        </article>
+
+        <!-- Noticias secundarias -->
+        <div class="news-side">
+
+          <article class="news-side-card">
+            <a
+              href="https://www.mlb.com/news/2026-2027-mlb-free-agents-for-every-team"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img
+                src="assets/home/galeria.jpg"
+                alt="Imagen ilustrativa de béisbol"
+                loading="lazy"
+              >
+
+              <div>
+                <div class="news-meta">
+                  <span class="news-category blue">AGENCIA LIBRE</span>
+                  <time datetime="2026-11-04">4 NOV 2026</time>
+                </div>
+
+                <h3>
+                  Los agentes libres disponibles,
+                  equipo por equipo
+                </h3>
+              </div>
+            </a>
+          </article>
+
+          <article class="news-side-card">
+            <a
+              href="https://www.mlb.com/news/ranking-the-free-agents-for-2026-27-offseason"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img
+                src="assets/home/estadisticas.jpg"
+                alt="Imagen deportiva representativa"
+                loading="lazy"
+              >
+
+              <div>
+                <div class="news-meta">
+                  <span class="news-category red">ANÁLISIS</span>
+                  <time datetime="2026-11-01">1 NOV 2026</time>
+                </div>
+
+                <h3>
+                  Treinta nombres que destacan
+                  en el mercado de invierno
+                </h3>
+              </div>
+            </a>
+          </article>
+
+          <article class="news-side-card">
+            <a
+              href="https://www.mlb.com/news/mlb-rumors-and-2026-27-free-agent-news-november-4"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img
+                src="assets/home/index.jpg"
+                alt="Fotografía editorial de un estadio de béisbol"
+                loading="lazy"
+              >
+
+              <div>
+                <div class="news-meta">
+                  <span class="news-category">MERCADO</span>
+                  <time datetime="2026-11-04">4 NOV 2026</time>
+                </div>
+
+                <h3>
+                  Rumores y decisiones que animan
+                  el inicio de la temporada baja
+                </h3>
+              </div>
+            </a>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Más noticias -->
+    <section class="news-section container" aria-labelledby="more-title">
+      <div class="news-section-heading">
+        <div>
+          <p class="eyebrow">Más novedades</p>
+          <h2 class="display" id="more-title">
+            Historias para seguir.
+          </h2>
+        </div>
+        <p>Información reciente con acceso directo a sus fuentes.</p>
+      </div>
+
+      <div class="more-news-grid">
+
+        <article class="news-card">
+          <a
+            href="https://www.mlb.com/news/internal-options-to-fill-cubs-corner-outfield-spots"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <div class="news-card-image">
+              <img
+                src="assets/home/equipo.jpg"
+                alt="Jugadores de béisbol; imagen representativa"
+                loading="lazy"
+              >
+            </div>
+
+            <div class="news-card-copy">
+              <div class="news-meta">
+                <span class="news-category blue">EQUIPOS</span>
+                <time datetime="2026-11-05">5 NOV 2026</time>
+              </div>
+
+              <h3>
+                Los Cubs evalúan opciones internas
+                para sus jardines
+              </h3>
+
+              <p>
+                Chicago analiza cómo cubrir posiciones de cara
+                a la próxima temporada.
+              </p>
+
+              <span class="news-read">Leer en MLB.com ↗</span>
+            </div>
+          </a>
+        </article>
+
+        <article class="news-card">
+          <a
+            href="https://www.mlb.com/news/austin-hedges-among-guardians-free-agents-2026-27-offseason"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <div class="news-card-image">
+              <img
+                src="assets/home/galeria1.jpg"
+                alt="Imagen ilustrativa de béisbol profesional"
+                loading="lazy"
+              >
+            </div>
+
+            <div class="news-card-copy">
+              <div class="news-meta">
+                <span class="news-category red">PLANTILLAS</span>
+                <time datetime="2026-11-02">2 NOV 2026</time>
+              </div>
+
+              <h3>
+                Cleveland afronta decisiones
+                importantes sobre sus agentes libres
+              </h3>
+
+              <p>
+                El futuro de Austin Hedges figura entre
+                los asuntos de la temporada baja.
+              </p>
+
+              <span class="news-read">Leer en MLB.com ↗</span>
+            </div>
+          </a>
+        </article>
+
+        <article class="news-card">
+          <a
+            href="https://www.mlb.com/news/storylines-to-follow-in-2026-mlb-offseason"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <div class="news-card-image">
+              <img
+                src="assets/home/history.jpg"
+                alt="Imagen editorial relacionada con béisbol"
+                loading="lazy"
+              >
+            </div>
+
+            <div class="news-card-copy">
+              <div class="news-meta">
+                <span class="news-category">TEMPORADA BAJA</span>
+                <time datetime="2026-11-01">1 NOV 2026</time>
+              </div>
+
+              <h3>
+                Siete temas clave para seguir
+                durante el invierno de MLB
+              </h3>
+
+              <p>
+                Contratos, mercado de jugadores y decisiones
+                de clubes marcarán los próximos meses.
+              </p>
+
+              <span class="news-read">Leer en MLB.com ↗</span>
+            </div>
+          </a>
+        </article>
+
+      </div>
+    </section>
+
+    
+
+      <a
+        class="button news-source-link"
+        href="https://www.mlb.com/news"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Consultar noticias MLB ↗
+      </a>
+    </aside>
+  </main>
+
+  <footer class="site-footer">
+    <span>StrikeZone · Novedades MLB</span>
+    <a class="text-link" href="estadisticas.html">
+      Ver estadísticas →
+    </a>
+  </footer>
+
+  <script src="js/core/feedback.js"></script>
+  <script src="js/core/nav.js"></script>
+</body>
+</html>

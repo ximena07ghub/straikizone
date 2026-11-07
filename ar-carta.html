@@ -1,18 +1,19 @@
-<!DOCTYPE html>
+
+<!doctype html>
 <html lang="es">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1, viewport-fit=cover,
+                 user-scalable=no">
   <meta name="theme-color" content="#0f2418">
   <title>StrikeZone | Carta AR</title>
-  <link rel="stylesheet" href="css/ar/card.css?v=10">
 
-  <!-- Compilador de targets. Usamos el core 1.1.4 porque esa distribución
-       sí expone window.MINDAR.Compiler en navegador. El archivo .mind generado
-       sigue usando formato v2 y luego lo consume MindAR/Three 1.2.5. -->
+  <link rel="stylesheet" href="css/ar/card.css">
+
+  <!-- Dependencias AR existentes -->
   <script src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.1.4/dist/mindar-image.prod.js"></script>
 
-  <!-- Three.js + integración MindAR/Three. -->
   <script type="importmap">
   {
     "imports": {
@@ -23,88 +24,266 @@
   }
   </script>
 </head>
+
 <body>
-  <main id="ar-container" class="ar-camera" aria-label="Experiencia de realidad aumentada">
+  <main id="ar-container" class="ar-camera"
+        aria-label="Experiencia de realidad aumentada">
+
+    <!-- Barra superior -->
     <div class="ar-topbar">
-      <a class="ar-back" href="coleccion.html" aria-label="Volver a la colección">←</a>
+      <a class="ar-back" href="escaner.html"
+         aria-label="Volver al escáner">←</a>
+
       <div class="ar-heading">
         <span data-ar-category>STRIKEZONE</span>
         <strong data-ar-name>Cargando carta…</strong>
       </div>
-      <a class="ar-card-link" data-print-link href="tarjeta-provisional.html">Tarjeta</a>
+
+      <a class="ar-card-link" data-print-link
+         href="tarjeta-provisional.html">
+        Tarjeta
+      </a>
     </div>
 
-    <div class="ar-reticle" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-    <div class="ar-status" data-ar-status>Listo para iniciar</div>
+    <!-- Guía visual -->
+    <div class="ar-reticle" aria-hidden="true">
+      <i></i><i></i><i></i><i></i>
+    </div>
 
+    <div class="ar-status" data-ar-status
+         role="status" aria-live="polite">
+      Listo para iniciar
+    </div>
+
+    <!-- Inicio de la experiencia existente -->
     <section class="ar-start" data-ar-start-panel>
       <div class="ar-start-card">
-        <span class="ar-kicker">STRIKEZONE · SEGUIMIENTO QR</span>
+        <span class="ar-kicker">
+          STRIKEZONE · SEGUIMIENTO QR
+        </span>
+
         <h1 data-start-title>Cargando carta…</h1>
-        <p>Apunta la cámara al <strong data-target-side>QR del modelo</strong>.</p>
+
+        <p>
+          Apunta la cámara al
+          <strong data-target-side>QR del modelo</strong>.
+        </p>
+
         <div class="ar-preview-row">
-          <img data-target-preview src="assets/brand/strikezone-logo.svg" alt="Vista previa del marcador QR del modelo">
+          <img data-target-preview
+               src="assets/brand/strikezone-logo.svg"
+               alt="Vista previa del marcador QR">
+
           <div>
             <small>Modelo actual</small>
             <strong data-model-label>Modelo 3D</strong>
-            <span> Puedes girar el modelo, moverlo con dos dedos, acercar/alejar y tocar para activar su animación.</span>
+            <span>
+              Puedes girar, mover y acercar el modelo.
+              Tócalo para activar su animación.
+            </span>
           </div>
         </div>
-        <button class="ar-primary" type="button" data-ar-start>Activar cámara AR</button>
-        <p class="ar-note">La cámara reconoce el marcador QR de este modelo. El objeto 3D solo aparece mientras el marcador permanezca visible.</p>
+
+        <button class="ar-primary" type="button"
+                data-ar-start>
+          Activar cámara AR
+        </button>
+
+        <p class="ar-note">
+          El modelo se muestra cuando la cámara reconoce
+          su marcador. Las funciones originales se conservan.
+        </p>
       </div>
     </section>
 
+    <!-- Ayuda de seguimiento -->
     <section class="ar-help" data-ar-help hidden>
       <strong>Apunta al QR del modelo</strong>
-      <span>Mantén el QR completo dentro de la cámara, relativamente plano y con buena iluminación.</span>
+      <span>
+        Mantén el marcador completo, plano y bien iluminado.
+      </span>
     </section>
 
     <div class="ar-gesture-tip" data-gesture-tip hidden>
-      1 dedo: gira · 2 dedos: mueve + zoom · toque: animar
+      1 dedo: gira · 2 dedos: mueve y zoom · toque: animar
     </div>
 
-    <section class="ar-info-panel" data-info-panel hidden><button type="button" data-info-close aria-label="Cerrar información">×</button><span class="ar-kicker">INFORMACIÓN DE LA CARTA</span><h2 data-info-title>Jugador</h2><p data-info-copy></p><div data-info-stats class="ar-info-stats"></div><small>La arquitectura queda preparada para narración, video y nuevas animaciones de modelos GLB.</small></section>
-    <nav class="ar-controls" aria-label="Controles del modelo" data-ar-controls hidden>
-      <button type="button" data-jump><span>▶</span>Animar</button>
-      <button type="button" data-info><span>ⓘ</span>Info</button>
-      <button type="button" data-confetti aria-pressed="false"><span>✦</span>Efectos OFF</button>
-      <button type="button" data-spin><span>↻</span>360°</button>
-      <button type="button" data-reset><span>⌂</span>Reiniciar</button>
+    <!-- Información -->
+    <section class="ar-info-panel" data-info-panel hidden>
+      <button type="button" data-info-close
+              aria-label="Cerrar información">×</button>
+
+      <span class="ar-kicker">
+        INFORMACIÓN DE LA CARTA
+      </span>
+
+      <h2 data-info-title>Jugador</h2>
+      <p data-info-team></p>
+      <p data-info-copy></p>
+      <div data-info-stats class="ar-info-stats"></div>
+
+      <small>
+        La información procede del catálogo AR de StrikeZone.
+      </small>
+    </section>
+
+    <!-- Controles originales + captura -->
+    <nav class="ar-controls"
+         aria-label="Controles del modelo"
+         data-ar-controls hidden>
+
+      <button type="button" data-jump>
+        <span>▶</span>Animar
+      </button>
+
+      <button type="button" data-info>
+        <span>ⓘ</span>Info
+      </button>
+
+      <button type="button" data-confetti aria-pressed="false">
+        <span>✦</span>Efectos OFF
+      </button>
+
+      <button type="button" data-spin>
+        <span>↻</span>360°
+      </button>
+
+      <button type="button" data-reset>
+        <span>⌂</span>Reiniciar
+      </button>
+
+      <button type="button" data-ar-capture>
+        <span>📷</span>Capturar
+      </button>
     </nav>
 
+    <!-- Confirmación de captura -->
+    <div class="ar-capture-message"
+         data-capture-message
+         role="status" aria-live="polite"
+         hidden>
+    </div>
+
+    <!-- Acceso al login -->
+    <div class="ar-capture-login" data-capture-login hidden>
+      <p>
+        Inicia sesión para guardar capturas AR
+        en Mis Medios.
+      </p>
+
+      <a href="login.html" data-capture-login-link>
+        Iniciar sesión
+      </a>
+
+      <button type="button" data-capture-login-close>
+        Cerrar
+      </button>
+    </div>
+
+    <!-- Error AR existente -->
     <div class="ar-error" data-ar-error hidden>
       <strong>No se pudo iniciar la experiencia AR.</strong>
-      <span data-ar-error-text>Revisa el permiso de cámara y la conexión a internet.</span>
-      <button type="button" data-ar-retry>Intentar de nuevo</button>
+
+      <span data-ar-error-text>
+        Revisa el permiso de cámara y la conexión.
+      </span>
+
+      <button type="button" data-ar-retry>
+        Intentar de nuevo
+      </button>
     </div>
   </main>
 
-  <script src="js/ar/cards.js?v=10"></script>
+  <!-- Catálogo y almacenamiento existentes -->
+  <script src="js/ar/cards.js"></script>
+  <script src="js/collection/rewards.js"></script>
+  <script src="js/media/photo-db.js"></script>
+
+  <!-- Información inicial -->
   <script>
     (() => {
       const params = new URLSearchParams(location.search);
+
       const id = (params.get('card') || '').trim().toLowerCase();
-      const modelKey = (params.get('model') || '').trim().toLowerCase();
-      const card = window.STRIKEZONE_AR_CARDS?.[id] || window.STRIKEZONE_AR_MODELS?.[modelKey]?.card;
-      const modelInfo = window.STRIKEZONE_AR_MODELS?.[modelKey];
+      const modelKey =
+        (params.get('model') || '').trim().toLowerCase();
+
+      const cards = window.STRIKEZONE_AR_CARDS || {};
+      const models = window.STRIKEZONE_AR_MODELS || {};
+
+      const modelInfo = !id ? models[modelKey] : null;
       const modelMode = !id && Boolean(modelInfo);
-      const name = modelMode ? `Modelo 3D · ${modelInfo.title}` : card?.name;
-      const set = (selector, value) => { const el = document.querySelector(selector); if (el && value != null) el.textContent = value; };
-      if (card) {
-        set('[data-ar-category]', modelMode ? 'STRIKEZONE · MODELO AR' : (card.category || 'STRIKEZONE'));
-        set('[data-ar-name]', name);
-        set('[data-start-title]', name);
-        set('[data-model-label]', card.modelLabel || 'Modelo 3D');
-        set('[data-target-side]', 'QR del modelo');
-        const preview = document.querySelector('[data-target-preview]');
-        if (preview) { preview.src = card.targetImage || card.markerImage; preview.alt = `Marcador QR de ${name}`; }
-        const print = document.querySelector('[data-print-link]');
-        if (print) { print.href = `tarjeta-provisional.html?card=${encodeURIComponent(card.id)}`; print.hidden = modelMode; }
-        document.title = `StrikeZone | ${name} AR`;
+
+      const card = id
+        ? cards[id]
+        : modelInfo?.card;
+
+      const name = modelMode
+        ? `Modelo 3D · ${modelInfo.title}`
+        : card?.name;
+
+      const set = (selector, value) => {
+        const element = document.querySelector(selector);
+
+        if (element && value != null) {
+          element.textContent = value;
+        }
+      };
+
+      if (!card) return;
+
+      set(
+        '[data-ar-category]',
+        modelMode
+          ? 'STRIKEZONE · MODELO AR'
+          : card.category || 'STRIKEZONE'
+      );
+
+      set('[data-ar-name]', name);
+      set('[data-start-title]', name);
+      set('[data-model-label]', card.modelLabel || 'Modelo 3D');
+      set('[data-target-side]', 'QR del modelo');
+
+      const preview = document.querySelector(
+        '[data-target-preview]'
+      );
+
+      if (preview) {
+        preview.src =
+          card.targetImage || card.markerImage;
+
+        preview.alt = `Marcador QR de ${name}`;
       }
+
+      const print = document.querySelector(
+        '[data-print-link]'
+      );
+
+      if (print) {
+        print.href =
+          `tarjeta-provisional.html?card=${encodeURIComponent(card.id)}`;
+
+        print.hidden = modelMode;
+      }
+
+      // No atribuir una carta al modo de modelo compartido.
+      set(
+        '[data-info-team]',
+        modelMode
+          ? 'Modelo compartido · sin jugador específico'
+          : [card.team, card.role || card.category]
+              .filter(Boolean)
+              .join(' · ')
+      );
+
+      document.title = `StrikeZone | ${name} AR`;
     })();
   </script>
-  <script type="module" src="js/ar/card-viewer.js?v=10"></script>
+
+  <!-- Visor AR original sin reemplazar -->
+  <script type="module" src="js/ar/card-viewer.js"></script>
+
+  <!-- Captura -->
+  <script src="js/ar/capture.js"></script>
 </body>
 </html>
