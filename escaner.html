@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="es">
 <head>
@@ -68,13 +67,37 @@
 
       <p>
         Escanea el código QR de una carta StrikeZone
-        y descubre su experiencia de realidad aumentada.
+        o reconoce el logo de un equipo de la Zona Norte.
       </p>
     </section>
 
-    <!-- Lector e instrucciones -->
     <section class="section-tight container">
-      <div class="scanner-shell">
+
+      <!-- Selector de tipo de escaneo -->
+      <div class="scanner-mode-selector">
+        <div>
+          <span class="eyebrow">DOS FORMAS DE ESCANEAR</span>
+          <h2>¿Qué quieres reconocer?</h2>
+        </div>
+
+        <div class="scanner-mode-actions">
+          <a
+            class="button"
+            href="#scanner-qr"
+          >
+            Escanear carta
+          </a>
+
+          <a
+            class="button button-green"
+            href="ar-equipo.html"
+          >
+            Escanear logo de equipo
+          </a>
+        </div>
+      </div>
+
+      <div class="scanner-shell" id="scanner-qr">
 
         <!-- Escáner QR -->
         <article class="scanner-card">
@@ -127,7 +150,7 @@
           </p>
         </article>
 
-        <!-- Guía de escaneo -->
+        <!-- Guía -->
         <aside
           class="scanner-info"
           aria-labelledby="scanner-guide-title"
@@ -203,21 +226,17 @@
             </li>
           </ol>
 
-          <!-- Recomendaciones -->
           <div class="scanner-tip">
             <strong>
-              Antes de escanear
+              ¿Quieres reconocer un equipo?
             </strong>
 
             <p>
-              Evita reflejos y asegúrate de que
-              el QR no esté cortado ni borroso.
-              Si el navegador lo solicita, activa
-              nuevamente la cámara al entrar al visor AR.
+              Para los equipos no necesitas un código QR.
+              Usa «Escanear logo de equipo» y apunta la
+              cámara directamente al logotipo registrado.
             </p>
           </div>
-
-
 
           <a
             class="scanner-return"
@@ -239,7 +258,7 @@
     </a>
   </footer>
 
-  <!-- Dependencias existentes -->
+  <!-- El escáner QR actual permanece intacto -->
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <script src="js/ar/cards.js"></script>
   <script src="js/ar/scanner.js"></script>

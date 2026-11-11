@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
+
+  <meta name="theme-color" content="#0f2418">
+
+  <title>StrikeZone | Equipos AR</title>
+
+  <link
+    rel="stylesheet"
+    href="css/ar/card.css"
+  >
+
+  <!--
+    Compiler de MindAR.
+    Se utiliza para convertir los logos registrados
+    en targets reconocibles.
+  -->
+  <script
+    src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.1.4/dist/mindar-image.prod.js"
+  ></script>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/",
+      "mindar-image-three": "https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js"
+    }
+  }
+  </script>
+
+  <style>
+    .team-reticle {
+      width: min(74vw, 380px);
+      aspect-ratio: 1 / 1;
+    }
+
+    .team-controls {
+      grid-template-columns:
+        repeat(3, minmax(0, 1fr)) !important;
+    }
+
+    /*
+      Mantener Info compacto.
+      No debe cubrir la mayor parte de la cámara.
+    */
+    .team-info-panel {
+      width:
+        min(430px, calc(100% - 24px));
+
+      max-height:
+        min(32dvh, 250px);
+
+      padding: 16px;
+
+      overflow-y: auto;
+    }
+
+    .team-info-panel h2 {
+      padding-right: 35px;
+    }
+
+    .team-info-city {
+      font-weight: 800;
+    }
+
+    .team-history-link {
+      display: inline-flex;
+
+      margin-top: 7px;
+
+      color: #d9e8b7;
+
+      font-size: .73rem;
+      font-weight: 800;
+
+      text-decoration: none;
+    }
+
+    .team-history-link:hover {
+      text-decoration: underline;
+    }
+
+    @media (min-width: 700px) {
+      .team-controls {
+        width:
+          min(520px, calc(100% - 30px));
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <main
+    id="ar-container"
+    class="ar-camera"
+    aria-label="Escáner AR de equipos"
+  >
+
+    <!-- Barra superior -->
+    <div class="ar-topbar">
+
+      <a
+        class="ar-back"
+        href="escaner.html"
+        aria-label="Volver al escáner"
+      >
+        ←
+      </a>
+
+      <div class="ar-heading">
+        <span>
+          STRIKEZONE · EQUIPOS AR
+        </span>
+
+        <strong data-team-name>
+          Escáner de equipos
+        </strong>
+      </div>
+
+      <a
+        class="ar-card-link"
+        href="historia-equipo.html"
+      >
+        Historia
+      </a>
+
+    </div>
+
+
+    <!-- Área visual de reconocimiento -->
+    <div
+      class="ar-reticle team-reticle"
+      aria-hidden="true"
+    >
+      <i></i>
+      <i></i>
+      <i></i>
+      <i></i>
+    </div>
+
+
+    <!-- Estado -->
+    <div
+      class="ar-status"
+      data-ar-status
+      role="status"
+      aria-live="polite"
+    >
+      Listo para iniciar
+    </div>
+
+
+    <!-- Inicio -->
+    <section
+      class="ar-start"
+      data-ar-start-panel
+    >
+      <div class="ar-start-card">
+
+        <span class="ar-kicker">
+          STRIKEZONE · RECONOCIMIENTO DE LOGOS
+        </span>
+
+        <h1>
+          Escanea un equipo
+        </h1>
+
+        <p>
+          Apunta la cámara al logo de un equipo registrado.
+          Cuando StrikeZone lo reconozca, aparecerá su
+          modelo 3D sobre el logo.
+        </p>
+
+        <button
+          class="ar-primary"
+          type="button"
+          data-ar-start
+        >
+          Activar cámara AR
+        </button>
+
+      </div>
+    </section>
+
+
+    <!-- Ayuda -->
+    <section
+      class="ar-help"
+      data-ar-help
+      hidden
+    >
+      <strong>
+        Apunta al logo del equipo
+      </strong>
+
+      <span>
+        Mantén el logo completo, estable
+        y bien iluminado.
+      </span>
+    </section>
+
+
+    <!-- Información compacta -->
+    <section
+      class="ar-info-panel team-info-panel"
+      data-info-panel
+      hidden
+    >
+
+      <button
+        type="button"
+        data-info-close
+        aria-label="Cerrar información"
+      >
+        ×
+      </button>
+
+      <span class="ar-kicker">
+        INFORMACIÓN DEL EQUIPO
+      </span>
+
+      <h2 data-info-title>
+        Equipo
+      </h2>
+
+      <p
+        class="team-info-city"
+        data-info-city
+      ></p>
+
+      <p data-info-copy></p>
+
+      <a
+        class="team-history-link"
+        data-team-history-link
+        href="historia-equipo.html"
+      >
+        Ver historia completa →
+      </a>
+
+    </section>
+
+
+    <!--
+      Solo los controles necesarios.
+      No hay efectos AR.
+    -->
+    <nav
+      class="ar-controls team-controls"
+      aria-label="Controles AR"
+      data-ar-controls
+      hidden
+    >
+
+      <button
+        type="button"
+        data-info
+      >
+        <span>ⓘ</span>
+        Info
+      </button>
+
+      <button
+        type="button"
+        data-reset
+      >
+        <span>⌂</span>
+        Reiniciar
+      </button>
+
+      <button
+        type="button"
+        data-ar-capture
+      >
+        <span>📷</span>
+        Capturar
+      </button>
+
+    </nav>
+
+
+    <!-- Resultado del guardado -->
+    <div
+      class="ar-capture-message"
+      data-capture-message
+      role="status"
+      aria-live="polite"
+      hidden
+    ></div>
+
+
+    <!-- Login -->
+    <div
+      class="ar-capture-login"
+      data-capture-login
+      hidden
+    >
+      <p>
+        Inicia sesión para guardar
+        la captura en Mis Medios.
+      </p>
+
+      <a
+        href="login.html"
+        data-capture-login-link
+      >
+        Iniciar sesión
+      </a>
+
+      <button
+        type="button"
+        data-capture-login-close
+      >
+        Cerrar
+      </button>
+    </div>
+
+
+    <!-- Errores -->
+    <div
+      class="ar-error"
+      data-ar-error
+      hidden
+    >
+      <strong>
+        No se pudo iniciar el escáner de equipos.
+      </strong>
+
+      <span data-ar-error-text>
+        Revisa el permiso de cámara
+        y vuelve a intentarlo.
+      </span>
+
+      <button
+        type="button"
+        data-ar-retry
+      >
+        Intentar de nuevo
+      </button>
+    </div>
+
+  </main>
+
+
+  <!-- Catálogo de equipos -->
+  <script src="js/history/history.js"></script>
+
+  <!-- Sesión y Mis Medios -->
+  <script src="js/collection/rewards.js"></script>
+  <script src="js/media/photo-db.js"></script>
+
+  <!-- AR de equipos -->
+  <script
+    type="module"
+    src="js/ar/team-viewer.js"
+  ></script>
+
+  <script src="js/ar/team-capture.js"></script>
+
+</body>
+</html>

@@ -220,6 +220,13 @@ window.StrikeZonePhotos = (() => {
       item.modelKey = meta.modelKey;
     }
 
+    if (
+      typeof meta.teamId === 'string' &&
+      meta.teamId
+    ) {
+      item.teamId = meta.teamId;
+    }
+
     const id = await transaction(
       'readwrite',
       store => store.add(item)
