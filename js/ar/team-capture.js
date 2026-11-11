@@ -38,7 +38,8 @@
   }
 
 
-  let saving = false;
+  let saving =
+    false;
 
 
   function notify(
@@ -49,27 +50,33 @@
       return;
     }
 
+
     message.textContent =
       text;
 
+
     message.hidden =
       false;
+
 
     message.classList.toggle(
       'is-error',
       error
     );
 
+
     clearTimeout(
       notify.timer
     );
 
+
     notify.timer =
-      setTimeout(
+      window.setTimeout(
         () => {
           message.hidden =
             true;
         },
+
         3500
       );
   }
@@ -91,6 +98,7 @@
       return;
     }
 
+
     if (loginLink) {
       loginLink.href =
         `login.html?next=${
@@ -100,6 +108,7 @@
         }`;
     }
 
+
     loginBox.hidden =
       false;
   }
@@ -107,6 +116,7 @@
 
   closeLogin?.addEventListener(
     'click',
+
     () => {
       if (loginBox) {
         loginBox.hidden =
@@ -116,11 +126,6 @@
   );
 
 
-  /*
-    Obtener exclusivamente el video real.
-    El canvas AR ya no se busca manualmente:
-    lo entrega team-viewer.js.
-  */
   function getVideo() {
     return container.querySelector(
       'video'
@@ -129,22 +134,15 @@
 
 
   /*
-    Tomar un frame WebGL fresco del viewer.
+    Snapshot producido por team-viewer.js.
 
-    Ese frame contiene:
-    - modelo 3D
-    - animación en su posición actual
-    - confeti si está activo
-
-    No contiene:
-    - botones HTML
-    - barra superior
-    - panel Info
+    No busca cualquier canvas.
+    Usa específicamente el renderer AR.
   */
   function getAROverlay() {
     return (
       window
-        .STRIKEZONE_AR_CAPTURE
+        .STRIKEZONE_TEAM_CAPTURE
         ?.captureOverlay
         ?.() ||
       null
@@ -161,6 +159,7 @@
   ) {
     const videoWidth =
       video.videoWidth;
+
 
     const videoHeight =
       video.videoHeight;
@@ -183,6 +182,7 @@
       ) *
       ratio;
 
+
     const destinationY =
       (
         rect.top -
@@ -190,15 +190,20 @@
       ) *
       ratio;
 
+
     const destinationWidth =
       rect.width *
       ratio;
+
 
     const destinationHeight =
       rect.height *
       ratio;
 
 
+    /*
+      Igualar object-fit: cover.
+    */
     const scale =
       Math.max(
         destinationWidth /
@@ -213,6 +218,7 @@
       destinationWidth /
       scale;
 
+
     const cropHeight =
       destinationHeight /
       scale;
@@ -222,13 +228,16 @@
       (
         videoWidth -
         cropWidth
-      ) / 2;
+      ) /
+      2;
+
 
     const sourceY =
       (
         videoHeight -
         cropHeight
-      ) / 2;
+      ) /
+      2;
 
 
     context.drawImage(
@@ -248,11 +257,23 @@
 
 
   function composeCapture() {
+    const arState =
+      window
+        .STRIKEZONE_TEAM_AR_STATE;
+
+
+    if (
+      !arState?.team ||
+      !arState?.targetVisible
+    ) {
+      throw new Error(
+        'Primero enfoca el logo hasta que aparezca el modelo.'
+      );
+    }
+
+
     const video =
       getVideo();
-
-    const overlay =
-      getAROverlay();
 
 
     if (
@@ -266,19 +287,12 @@
     }
 
 
-    const arState =
-      window
-        .STRIKEZONE_TEAM_AR_STATE;
-
-
-    if (
-      !arState?.team ||
-      !arState?.targetVisible
-    ) {
-      throw new Error(
-        'Primero apunta al logo hasta que aparezca el modelo.'
-      );
-    }
+    /*
+      AQUÍ y solo aquí se solicita
+      el frame del modelo.
+    */
+    const overlay =
+      getAROverlay();
 
 
     if (
@@ -286,7 +300,7 @@
       !overlay?.rect
     ) {
       throw new Error(
-        'No se pudo capturar el modelo 3D.'
+        'No se pudo obtener el modelo 3D para la fotografía.'
       );
     }
 
@@ -295,9 +309,11 @@
       container
         .getBoundingClientRect();
 
+
     const videoRect =
       video
         .getBoundingClientRect();
+
 
     const overlayRect =
       overlay.rect;
@@ -310,7 +326,7 @@
       !overlayRect.height
     ) {
       throw new Error(
-        'No se pudo obtener el encuadre AR.'
+        'No se pudo calcular el encuadre AR.'
       );
     }
 
@@ -319,23 +335,25 @@
       Math.min(
         window.devicePixelRatio ||
           1,
+
         2
       );
 
 
-    const canvas =
+    const output =
       document.createElement(
         'canvas'
       );
 
 
-    canvas.width =
+    output.width =
       Math.round(
         bounds.width *
         ratio
       );
 
-    canvas.height =
+
+    output.height =
       Math.round(
         bounds.height *
         ratio
@@ -343,10 +361,12 @@
 
 
     const context =
-      canvas.getContext(
+      output.getContext(
         '2d',
+
         {
-          alpha: false
+          alpha:
+            false
         }
       );
 
@@ -359,7 +379,8 @@
 
 
     /*
-      1. Cámara real.
+      CAPA 1:
+      cámara física.
     */
     drawVideo(
       context,
@@ -371,7 +392,14 @@
 
 
     /*
-      2. Modelo 3D + efectos WebGL.
+      CAPA 2:
+      modelo 3D y efectos.
+
+      No incluye:
+      - botones
+      - estado
+      - Info
+      - navbar
     */
     context.drawImage(
       overlay.canvas,
@@ -396,7 +424,7 @@
     );
 
 
-    return canvas;
+    return output;
   }
 
 
@@ -416,16 +444,21 @@
                 blob
               );
 
-            } else {
-              reject(
-                new Error(
-                  'No se generó la imagen AR.'
-                )
-              );
+
+              return;
             }
+
+
+            reject(
+              new Error(
+                'No se generó la fotografía AR.'
+              )
+            );
           },
 
-          'image/png'
+          'image/png',
+
+          1
         );
       }
     );
@@ -445,10 +478,12 @@
     if (!session?.id) {
       requestLogin();
 
+
       notify(
         'Inicia sesión para guardar capturas en Mis Medios.',
         true
       );
+
 
       return;
     }
@@ -468,6 +503,7 @@
         true
       );
 
+
       return;
     }
 
@@ -482,11 +518,14 @@
         true
       );
 
+
       return;
     }
 
 
-    saving = true;
+    saving =
+      true;
+
 
     button.disabled =
       true;
@@ -494,8 +533,7 @@
 
     try {
       /*
-        composeCapture solicita primero un
-        render WebGL fresco.
+        Cámara + modelo en un solo canvas.
       */
       const canvas =
         composeCapture();
@@ -542,7 +580,9 @@
           );
 
 
-      if (id == null) {
+      if (
+        id == null
+      ) {
         throw new Error(
           'IndexedDB no confirmó el guardado.'
         );
@@ -562,12 +602,15 @@
 
       notify(
         error?.message ||
-        'No se pudo guardar la fotografía.',
+        'No se pudo guardar la fotografía AR.',
+
         true
       );
 
     } finally {
-      saving = false;
+      saving =
+        false;
+
 
       button.disabled =
         false;

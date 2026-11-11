@@ -8,6 +8,10 @@ import {
   MindARThree
 } from 'mindar-image-three';
 
+import {
+  compileTeamTargets
+} from './team-target-compiler.js';
+
 
 const teams = (
   window.STRIKEZONE_TEAMS || []
@@ -119,47 +123,72 @@ const historyLink =
   );
 
 
-let mindarThree = null;
-let renderer = null;
-let scene = null;
-let camera = null;
+let mindarThree =
+  null;
 
-let compiledBlobUrl = '';
+let renderer =
+  null;
 
-let started = false;
+let scene =
+  null;
 
-/*
-  Solo será true cuando
-  await mindarThree.start()
-  termine correctamente.
-*/
-let mindarStarted = false;
+let camera =
+  null;
 
-let currentTeam = null;
-let currentEntry = null;
+let compiledBlobUrl =
+  '';
 
-const entries = [];
+
+let starting =
+  false;
+
+let started =
+  false;
+
+
+let currentTeam =
+  null;
+
+let currentEntry =
+  null;
+
+
+const entries =
+  [];
+
 
 const clock =
   new THREE.Clock();
 
+
 const pointers =
   new Map();
 
-let lastSingle = null;
-let lastPinchDistance = 0;
-let lastPinchCenter = null;
-let tapCandidate = null;
+
+let lastSingle =
+  null;
+
+let lastPinchDistance =
+  0;
+
+let lastPinchCenter =
+  null;
+
+let tapCandidate =
+  null;
 
 
 window.STRIKEZONE_TEAM_AR_STATE = {
-  team: null,
-  targetVisible: false
+  team:
+    null,
+
+  targetVisible:
+    false
 };
 
 
 /* =========================================================
-   INTERFAZ
+   UI
    ========================================================= */
 
 function status(message) {
@@ -171,25 +200,29 @@ function status(message) {
 
 
 function showError(message) {
-  const box =
+  const errorBox =
     document.querySelector(
       '[data-ar-error]'
     );
 
-  const text =
+
+  const errorText =
     document.querySelector(
       '[data-ar-error-text]'
     );
 
-  if (text) {
-    text.textContent =
+
+  if (errorText) {
+    errorText.textContent =
       message;
   }
 
-  if (box) {
-    box.hidden =
+
+  if (errorBox) {
+    errorBox.hidden =
       false;
   }
+
 
   status(
     'AR no disponible'
@@ -198,53 +231,22 @@ function showError(message) {
 
 
 function hideError() {
-  const box =
+  const errorBox =
     document.querySelector(
       '[data-ar-error]'
     );
 
-  if (box) {
-    box.hidden =
+
+  if (errorBox) {
+    errorBox.hidden =
       true;
   }
 }
 
 
 /* =========================================================
-   TARGETS
+   TARGET COMPILADO AISLADO
    ========================================================= */
-
-function loadImageElement(src) {
-  return new Promise(
-    (
-      resolve,
-      reject
-    ) => {
-      const image =
-        new Image();
-
-      image.onload =
-        () => {
-          resolve(
-            image
-          );
-        };
-
-      image.onerror =
-        () => {
-          reject(
-            new Error(
-              `No se pudo cargar el logo AR: ${src}`
-            )
-          );
-        };
-
-      image.src =
-        src;
-    }
-  );
-}
-
 
 async function prepareTargets() {
   if (!teams.length) {
@@ -253,76 +255,24 @@ async function prepareTargets() {
     );
   }
 
-  const Compiler =
-    window.MINDAR?.Compiler ||
-    window.MINDAR?.IMAGE?.Compiler;
 
-
-  if (!Compiler) {
-    throw new Error(
-      'No se pudo cargar el compilador de MindAR.'
+  const targetImages =
+    teams.map(
+      team =>
+        team.targetImage
     );
-  }
-
-
-  status(
-    'Preparando reconocimiento del logo…'
-  );
-
-
-  const images =
-    await Promise.all(
-      teams.map(
-        team =>
-          loadImageElement(
-            team.targetImage
-          )
-      )
-    );
-
-
-  const compiler =
-    new Compiler();
-
-
-  await compiler.compileImageTargets(
-    images,
-
-    progress => {
-      const value =
-        Number(
-          progress
-        );
-
-      const percentage =
-        Number.isFinite(
-          value
-        )
-          ? Math.round(
-              value <= 1
-                ? value * 100
-                : value
-            )
-          : 0;
-
-
-      status(
-        `Preparando reconocimiento… ${
-          Math.max(
-            0,
-            Math.min(
-              100,
-              percentage
-            )
-          )
-        }%`
-      );
-    }
-  );
 
 
   const buffer =
-    await compiler.exportData();
+    await compileTeamTargets(
+      targetImages,
+
+      percentage => {
+        status(
+          `Preparando reconocimiento… ${percentage}%`
+        );
+      }
+    );
 
 
   if (compiledBlobUrl) {
@@ -336,12 +286,18 @@ async function prepareTargets() {
     URL.createObjectURL(
       new Blob(
         [buffer],
+
         {
           type:
             'application/octet-stream'
         }
       )
     );
+
+
+  status(
+    'Reconocimiento preparado ✓'
+  );
 
 
   return compiledBlobUrl;
@@ -450,7 +406,7 @@ function createConfetti() {
 
 
 /* =========================================================
-   MODELOS
+   MODELO
    ========================================================= */
 
 async function loadTeamModel(entry) {
@@ -584,7 +540,7 @@ async function loadTeamModel(entry) {
 
 
 /* =========================================================
-   INFO EQUIPO
+   INFO
    ========================================================= */
 
 function updateTeamInfo(team) {
@@ -635,7 +591,7 @@ function updateTeamInfo(team) {
 
 
 /* =========================================================
-   TRANSFORMACIÓN DEL MODELO
+   TRANSFORMACIONES
    ========================================================= */
 
 function applyTransform(entry) {
@@ -656,11 +612,6 @@ function applyTransform(entry) {
   }
 
 
-  if (!entry.modelPivot) {
-    return;
-  }
-
-
   entry.modelPivot.rotation.x =
     entry.userRotX;
 
@@ -678,7 +629,11 @@ function applyTransform(entry) {
 }
 
 
-function resetEntry(entry) {
+function resetCurrentModel() {
+  const entry =
+    currentEntry;
+
+
   if (!entry) {
     return;
   }
@@ -723,13 +678,11 @@ function resetEntry(entry) {
   );
 
 
-  entry.modelPivot
-    .rotation
-    .set(
-      0,
-      0,
-      0
-    );
+  entry.modelPivot.rotation.set(
+    0,
+    0,
+    0
+  );
 
 
   entry.modelPivot
@@ -739,13 +692,12 @@ function resetEntry(entry) {
     );
 
 
-  if (entry.confettiOn) {
-    entry.confettiOn =
-      false;
+  entry.confettiOn =
+    false;
 
-    entry.confettiGroup.visible =
-      false;
-  }
+
+  entry.confettiGroup.visible =
+    false;
 
 
   if (confettiBtn) {
@@ -754,21 +706,15 @@ function resetEntry(entry) {
       'false'
     );
 
+
     confettiBtn.innerHTML =
       '<span>✦</span>Efectos OFF';
   }
 }
 
 
-function resetCurrentModel() {
-  resetEntry(
-    currentEntry
-  );
-}
-
-
 /* =========================================================
-   ANIMACIÓN
+   ANIMACIONES
    ========================================================= */
 
 function startJump() {
@@ -795,7 +741,9 @@ function startJump() {
     performance.now();
 
 
-  if (entry.embeddedAction) {
+  if (
+    entry.embeddedAction
+  ) {
     entry.embeddedAction.reset();
 
     entry.embeddedAction.play();
@@ -864,7 +812,7 @@ function toggleConfetti() {
 }
 
 
-function updateEntryAnimations(
+function updateAnimations(
   entry,
   now,
   delta
@@ -880,12 +828,12 @@ function updateEntryAnimations(
 
 
   if (
-    entry.jumping &&
-    entry.root
+    entry.jumping
   ) {
     const progress =
       Math.min(
         1,
+
         (
           now -
           entry.jumpStart
@@ -927,12 +875,12 @@ function updateEntryAnimations(
 
 
   if (
-    entry.spinning &&
-    entry.modelPivot
+    entry.spinning
   ) {
     const progress =
       Math.min(
         1,
+
         (
           now -
           entry.spinStart
@@ -946,6 +894,7 @@ function updateEntryAnimations(
       Math.pow(
         1 -
         progress,
+
         3
       );
 
@@ -972,8 +921,7 @@ function updateEntryAnimations(
 
 
   if (
-    entry.confettiGroup
-      ?.visible
+    entry.confettiGroup.visible
   ) {
     const time =
       now /
@@ -1046,48 +994,49 @@ function updateEntryAnimations(
    GESTOS
    ========================================================= */
 
+function pointerCenter() {
+  const values =
+    [
+      ...pointers.values()
+    ];
+
+
+  if (!values.length) {
+    return null;
+  }
+
+
+  return {
+    x:
+      values.reduce(
+        (
+          total,
+          point
+        ) =>
+          total +
+          point.x,
+
+        0
+      ) /
+      values.length,
+
+    y:
+      values.reduce(
+        (
+          total,
+          point
+        ) =>
+          total +
+          point.y,
+
+        0
+      ) /
+      values.length
+  };
+}
+
+
 function attachGestures() {
-  const centerOfPointers =
-    () => {
-      const values =
-        [
-          ...pointers.values()
-        ];
-
-
-      if (!values.length) {
-        return null;
-      }
-
-
-      return {
-        x:
-          values.reduce(
-            (
-              total,
-              point
-            ) =>
-              total +
-              point.x,
-            0
-          ) /
-          values.length,
-
-        y:
-          values.reduce(
-            (
-              total,
-              point
-            ) =>
-              total +
-              point.y,
-            0
-          ) /
-          values.length
-      };
-    };
-
-
   container.addEventListener(
     'pointerdown',
 
@@ -1120,6 +1069,7 @@ function attachGestures() {
 
       pointers.set(
         event.pointerId,
+
         {
           x:
             event.clientX,
@@ -1168,7 +1118,7 @@ function attachGestures() {
           null;
 
 
-        const points =
+        const values =
           [
             ...pointers.values()
           ];
@@ -1176,16 +1126,16 @@ function attachGestures() {
 
         lastPinchDistance =
           Math.hypot(
-            points[0].x -
-              points[1].x,
+            values[0].x -
+              values[1].x,
 
-            points[0].y -
-              points[1].y
+            values[0].y -
+              values[1].y
           );
 
 
         lastPinchCenter =
-          centerOfPointers();
+          pointerCenter();
       }
     }
   );
@@ -1214,6 +1164,7 @@ function attachGestures() {
 
       pointers.set(
         event.pointerId,
+
         {
           x:
             event.clientX,
@@ -1295,7 +1246,7 @@ function attachGestures() {
       if (
         pointers.size === 2
       ) {
-        const points =
+        const values =
           [
             ...pointers.values()
           ];
@@ -1303,16 +1254,16 @@ function attachGestures() {
 
         const distance =
           Math.hypot(
-            points[0].x -
-              points[1].x,
+            values[0].x -
+              values[1].x,
 
-            points[0].y -
-              points[1].y
+            values[0].y -
+              values[1].y
           );
 
 
         const center =
-          centerOfPointers();
+          pointerCenter();
 
 
         if (
@@ -1393,7 +1344,7 @@ function attachGestures() {
 
   const endPointer =
     event => {
-      const canTap =
+      const shouldAnimate =
         tapCandidate &&
         tapCandidate.id ===
           event.pointerId &&
@@ -1433,7 +1384,7 @@ function attachGestures() {
       }
 
 
-      if (canTap) {
+      if (shouldAnimate) {
         startJump();
       }
 
@@ -1507,22 +1458,30 @@ function attachGestures() {
 
 
 /* =========================================================
-   CAPTURA DEL CANVAS WEBGL
+   CAPTURA WEBGL
+
+   Solo se llama desde team-capture.js
+   cuando el usuario presiona Capturar.
    ========================================================= */
 
 function captureOverlay() {
   if (
+    !started ||
     !renderer ||
     !scene ||
-    !camera
+    !camera ||
+    !currentEntry ||
+    !window
+      .STRIKEZONE_TEAM_AR_STATE
+      .targetVisible
   ) {
     return null;
   }
 
 
   /*
-    Render fresco justo antes de leer
-    los píxeles del framebuffer.
+    Render fresco del estado exacto:
+    modelo + posición + rotación + confeti.
   */
   renderer.render(
     scene,
@@ -1552,6 +1511,13 @@ function captureOverlay() {
 
   const gl =
     renderer.getContext();
+
+
+  /*
+    Esperar a que la GPU termine el frame
+    antes de leerlo.
+  */
+  gl.finish();
 
 
   const pixels =
@@ -1605,42 +1571,48 @@ function captureOverlay() {
     );
 
 
-  const rowBytes =
+  const rowSize =
     width *
     4;
 
 
   /*
-    readPixels entrega las filas
-    invertidas verticalmente.
+    WebGL:
+    origen inferior izquierdo.
+
+    Canvas:
+    origen superior izquierdo.
+
+    Invertimos las filas.
   */
   for (
     let y = 0;
     y < height;
     y += 1
   ) {
-    const sourceStart =
+    const sourceOffset =
       (
         height -
         1 -
         y
       ) *
-      rowBytes;
+      rowSize;
 
 
-    const destinationStart =
+    const targetOffset =
       y *
-      rowBytes;
+      rowSize;
 
 
     imageData.data.set(
       pixels.subarray(
-        sourceStart,
-        sourceStart +
-          rowBytes
+        sourceOffset,
+
+        sourceOffset +
+        rowSize
       ),
 
-      destinationStart
+      targetOffset
     );
   }
 
@@ -1678,7 +1650,10 @@ function captureOverlay() {
 }
 
 
-window.STRIKEZONE_AR_CAPTURE = {
+/*
+  API exclusivamente para team-capture.js.
+*/
+window.STRIKEZONE_TEAM_CAPTURE = {
   captureOverlay
 };
 
@@ -1773,25 +1748,6 @@ async function teamFound(entry) {
 
         4200
       );
-    }
-
-
-    if (confettiBtn) {
-      confettiBtn.setAttribute(
-        'aria-pressed',
-
-        String(
-          entry.confettiOn
-        )
-      );
-
-
-      confettiBtn.innerHTML =
-        `<span>✦</span>Efectos ${
-          entry.confettiOn
-            ? 'ON'
-            : 'OFF'
-        }`;
     }
 
 
@@ -2013,99 +1969,20 @@ function configureAnchors() {
 
 
 /* =========================================================
-   LIMPIEZA DE INICIALIZACIÓN FALLIDA
-   ========================================================= */
-
-function clearPartialAR() {
-  renderer
-    ?.setAnimationLoop(
-      null
-    );
-
-
-  /*
-    Importante:
-    solo removemos nodos creados por MindAR.
-    No llamamos stop() aquí.
-  */
-  container
-    ?.querySelectorAll(
-      ':scope > video, :scope > canvas'
-    )
-    .forEach(
-      element =>
-        element.remove()
-    );
-
-
-  renderer =
-    null;
-
-  scene =
-    null;
-
-  camera =
-    null;
-
-  mindarThree =
-    null;
-
-
-  mindarStarted =
-    false;
-
-  started =
-    false;
-
-
-  currentTeam =
-    null;
-
-  currentEntry =
-    null;
-
-
-  entries.length =
-    0;
-
-
-  pointers.clear();
-
-
-  lastSingle =
-    null;
-
-  lastPinchDistance =
-    0;
-
-  lastPinchCenter =
-    null;
-
-  tapCandidate =
-    null;
-
-
-  window
-    .STRIKEZONE_TEAM_AR_STATE
-    .team =
-      null;
-
-
-  window
-    .STRIKEZONE_TEAM_AR_STATE
-    .targetVisible =
-      false;
-}
-
-
-/* =========================================================
-   INICIO AR
+   INICIO LIMPIO DE MINDAR
    ========================================================= */
 
 async function startAR() {
-  if (started) {
+  if (
+    starting ||
+    started
+  ) {
     return;
   }
+
+
+  starting =
+    true;
 
 
   hideError();
@@ -2118,6 +1995,13 @@ async function startAR() {
 
 
   try {
+    /*
+      1.
+      Compiler aislado.
+
+      Cuando termine, su iframe ya habrá
+      desaparecido.
+    */
     const targetSource =
       await prepareTargets();
 
@@ -2128,8 +2012,9 @@ async function startAR() {
 
 
     /*
-      Esta parte mantiene el orden del
-      commit que ya funcionaba.
+      2.
+      AQUÍ se crea la única instancia MindARThree
+      del documento principal.
     */
     mindarThree =
       new MindARThree({
@@ -2159,6 +2044,16 @@ async function startAR() {
     } = mindarThree);
 
 
+    /*
+      Mantener fondo transparente.
+      El video de cámara está debajo.
+    */
+    renderer.setClearColor(
+      0x000000,
+      0
+    );
+
+
     renderer.setPixelRatio(
       Math.min(
         window.devicePixelRatio ||
@@ -2169,6 +2064,10 @@ async function startAR() {
     );
 
 
+    /*
+      Iluminación del flujo original
+      que ya funcionaba.
+    */
     scene.add(
       new THREE.HemisphereLight(
         0xffffff,
@@ -2178,10 +2077,6 @@ async function startAR() {
     );
 
 
-    /*
-      Valores originales de iluminación
-      del commit funcional.
-    */
     const directional =
       new THREE.DirectionalLight(
         0xffffff,
@@ -2201,23 +2096,28 @@ async function startAR() {
     );
 
 
+    /*
+      Anchors antes del start,
+      igual que el flujo probado.
+    */
     configureAnchors();
 
 
     /*
-      Punto crítico:
-      no marcamos la cámara como iniciada
-      hasta que esta promesa termine.
+      3.
+      Cámara.
+
+      Nada del sistema de captura se ejecuta aquí.
     */
     await mindarThree.start();
 
 
-    mindarStarted =
-      true;
-
-
     started =
       true;
+
+
+    starting =
+      false;
 
 
     if (startPanel) {
@@ -2259,7 +2159,7 @@ async function startAR() {
             .STRIKEZONE_TEAM_AR_STATE
             .targetVisible
         ) {
-          updateEntryAnimations(
+          updateAnimations(
             currentEntry,
             now,
             delta
@@ -2275,6 +2175,14 @@ async function startAR() {
     );
 
   } catch (error) {
+    starting =
+      false;
+
+
+    started =
+      false;
+
+
     console.error(
       'Error iniciando Team AR:',
       error
@@ -2282,30 +2190,14 @@ async function startAR() {
 
 
     /*
-      NO llamar stop() si start()
-      nunca terminó.
+      MUY IMPORTANTE:
 
-      Esto elimina:
-      Cannot read properties of undefined
-      (reading 'stopProcessVideo')
+      No llamar:
+      mindarThree.stop()
+
+      Si start() falló antes de crear controller,
+      MindAR lanza stopProcessVideo undefined.
     */
-    if (
-      mindarStarted &&
-      mindarThree
-    ) {
-      try {
-        await mindarThree.stop();
-
-      } catch (stopError) {
-        console.warn(
-          'No se pudo detener MindAR:',
-          stopError
-        );
-      }
-    }
-
-
-    clearPartialAR();
 
 
     if (startBtn) {
@@ -2316,7 +2208,7 @@ async function startAR() {
 
     showError(
       error?.message ||
-      'No se pudo iniciar la cámara AR.'
+      'No se pudo iniciar la cámara AR. Pulsa Recargar y reintentar.'
     );
   }
 }
@@ -2325,6 +2217,30 @@ async function startAR() {
 /* =========================================================
    EVENTOS
    ========================================================= */
+
+jumpBtn?.addEventListener(
+  'click',
+  startJump
+);
+
+
+spinBtn?.addEventListener(
+  'click',
+  startSpin
+);
+
+
+confettiBtn?.addEventListener(
+  'click',
+  toggleConfetti
+);
+
+
+resetBtn?.addEventListener(
+  'click',
+  resetCurrentModel
+);
+
 
 infoBtn?.addEventListener(
   'click',
@@ -2356,30 +2272,6 @@ infoClose?.addEventListener(
 );
 
 
-jumpBtn?.addEventListener(
-  'click',
-  startJump
-);
-
-
-spinBtn?.addEventListener(
-  'click',
-  startSpin
-);
-
-
-confettiBtn?.addEventListener(
-  'click',
-  toggleConfetti
-);
-
-
-resetBtn?.addEventListener(
-  'click',
-  resetCurrentModel
-);
-
-
 startBtn?.addEventListener(
   'click',
 
@@ -2389,13 +2281,18 @@ startBtn?.addEventListener(
 );
 
 
+/*
+  Un start() fallido puede dejar listeners
+  internos de MindAR.
+
+  El único retry verdaderamente limpio
+  es crear un documento nuevo.
+*/
 retryBtn?.addEventListener(
   'click',
 
   () => {
-    hideError();
-
-    void startAR();
+    window.location.reload();
   }
 );
 
@@ -2404,7 +2301,7 @@ attachGestures();
 
 
 /* =========================================================
-   SALIDA DE LA PÁGINA
+   SALIDA
    ========================================================= */
 
 window.addEventListener(
@@ -2418,19 +2315,25 @@ window.addEventListener(
 
 
     /*
-      Aquí sí puede detenerse,
-      pero únicamente si start()
-      había terminado correctamente.
+      Solo intentar stop() si start()
+      sí terminó.
     */
     if (
-      mindarStarted &&
+      started &&
       mindarThree
     ) {
-      mindarThree
-        .stop()
-        .catch(
+      try {
+        const result =
+          mindarThree.stop();
+
+
+        result?.catch?.(
           () => {}
         );
+
+      } catch {
+        // Sin acción.
+      }
     }
 
 

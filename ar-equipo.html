@@ -17,10 +17,10 @@
     href="css/ar/card.css"
   >
 
-  <script
-    src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.1.4/dist/mindar-image.prod.js"
-  ></script>
-
+  <!--
+    Solo runtime AR.
+    No cargar aquí el compiler global de MindAR.
+  -->
   <script type="importmap">
   {
     "imports": {
@@ -37,19 +37,11 @@
       aspect-ratio: 1 / 1;
     }
 
-    /*
-      Seis controles:
-      2 filas x 3 columnas.
-    */
     .team-controls {
       grid-template-columns:
         repeat(3, minmax(0, 1fr)) !important;
     }
 
-    /*
-      El panel Info permanece compacto para
-      no cubrir la mayor parte de la cámara.
-    */
     .team-info-panel {
       width:
         min(430px, calc(100% - 24px));
@@ -135,7 +127,7 @@
     </div>
 
 
-    <!-- Área de reconocimiento -->
+    <!-- Retícula cuadrada para logos -->
     <div
       class="ar-reticle team-reticle"
       aria-hidden="true"
@@ -180,8 +172,9 @@
         </p>
 
         <p>
-          Puedes girarlo, moverlo, acercarlo, activar
-          animaciones y añadir efectos.
+          Puedes girar, mover y acercar el modelo,
+          reproducir su animación, activar efectos
+          y guardar una fotografía AR.
         </p>
 
         <button
@@ -196,7 +189,7 @@
     </section>
 
 
-    <!-- Ayuda -->
+    <!-- Ayuda durante tracking -->
     <section
       class="ar-help"
       data-ar-help
@@ -213,7 +206,7 @@
     </section>
 
 
-    <!-- Guía de gestos -->
+    <!-- Ayuda de gestos -->
     <div
       class="ar-gesture-tip"
       data-gesture-tip
@@ -223,7 +216,7 @@
     </div>
 
 
-    <!-- Información del equipo -->
+    <!-- Información -->
     <section
       class="ar-info-panel team-info-panel"
       data-info-panel
@@ -264,7 +257,7 @@
     </section>
 
 
-    <!-- Controles AR -->
+    <!-- Controles -->
     <nav
       class="ar-controls team-controls"
       aria-label="Controles del modelo"
@@ -324,7 +317,7 @@
     </nav>
 
 
-    <!-- Resultado de captura -->
+    <!-- Mensaje de captura -->
     <div
       class="ar-capture-message"
       data-capture-message
@@ -361,7 +354,7 @@
     </div>
 
 
-    <!-- Errores -->
+    <!-- Error -->
     <div
       class="ar-error"
       data-ar-error
@@ -380,26 +373,27 @@
         type="button"
         data-ar-retry
       >
-        Intentar de nuevo
+        Recargar y reintentar
       </button>
     </div>
 
   </main>
 
 
-  <!-- Catálogo de equipos -->
+  <!-- Datos de equipos -->
   <script src="js/history/history.js"></script>
 
-  <!-- Sesión y Mis Medios -->
+  <!-- Usuario y medios -->
   <script src="js/collection/rewards.js"></script>
   <script src="js/media/photo-db.js"></script>
 
-  <!-- AR -->
+  <!-- Runtime AR -->
   <script
     type="module"
     src="js/ar/team-viewer.js"
   ></script>
 
+  <!-- Guardado -->
   <script src="js/ar/team-capture.js"></script>
 
 </body>
