@@ -8,17 +8,12 @@ import {
   MindARThree
 } from 'mindar-image-three';
 
-import {
-  compileTeamTargets
-} from './team-target-compiler.js';
-
 
 const teams = (
   window.STRIKEZONE_TEAMS || []
-).filter(
-  team =>
-    team.targetImage &&
-    team.model
+).filter(team =>
+  team.targetImage &&
+  team.model
 );
 
 
@@ -123,73 +118,44 @@ const historyLink =
   );
 
 
-let mindarThree =
-  null;
+let mindarThree = null;
+let renderer = null;
+let scene = null;
+let camera = null;
 
-let renderer =
-  null;
+let compiledBlobUrl = '';
 
-let scene =
-  null;
+let started = false;
 
-let camera =
-  null;
+let currentTeam = null;
+let currentRoot = null;
+let currentEntry = null;
 
-let compiledBlobUrl =
-  '';
-
-
-let starting =
-  false;
-
-let started =
-  false;
-
-
-let currentTeam =
-  null;
-
-let currentEntry =
-  null;
-
-
-const entries =
-  [];
-
+const entries = [];
 
 const clock =
   new THREE.Clock();
 
-
 const pointers =
   new Map();
 
-
-let lastSingle =
-  null;
-
-let lastPinchDistance =
-  0;
-
-let lastPinchCenter =
-  null;
-
-let tapCandidate =
-  null;
+let lastSingle = null;
+let lastPinchDistance = 0;
+let lastPinchCenter = null;
+let tapCandidate = null;
 
 
 window.STRIKEZONE_TEAM_AR_STATE = {
-  team:
-    null,
-
-  targetVisible:
-    false
+  team: null,
+  targetVisible: false
 };
 
 
-/* =========================================================
-   UI
-   ========================================================= */
+/*
+  ==========================================================
+  UI
+  ==========================================================
+*/
 
 function status(message) {
   if (statusEl) {
@@ -200,29 +166,24 @@ function status(message) {
 
 
 function showError(message) {
-  const errorBox =
+  const box =
     document.querySelector(
       '[data-ar-error]'
     );
 
-
-  const errorText =
+  const text =
     document.querySelector(
       '[data-ar-error-text]'
     );
 
-
-  if (errorText) {
-    errorText.textContent =
+  if (text) {
+    text.textContent =
       message;
   }
 
-
-  if (errorBox) {
-    errorBox.hidden =
-      false;
+  if (box) {
+    box.hidden = false;
   }
-
 
   status(
     'AR no disponible'
@@ -231,22 +192,46 @@ function showError(message) {
 
 
 function hideError() {
-  const errorBox =
+  const box =
     document.querySelector(
       '[data-ar-error]'
     );
 
-
-  if (errorBox) {
-    errorBox.hidden =
-      true;
+  if (box) {
+    box.hidden = true;
   }
 }
 
 
-/* =========================================================
-   TARGET COMPILADO AISLADO
-   ========================================================= */
+/*
+  ==========================================================
+  COMPILACIÓN DE TARGETS
+  ==========================================================
+*/
+
+function loadImageElement(src) {
+  return new Promise(
+    (resolve, reject) => {
+      const image =
+        new Image();
+
+      image.onload =
+        () => resolve(image);
+
+      image.onerror =
+        () => {
+          reject(
+            new Error(
+              `No se pudo cargar el logo AR: ${src}`
+            )
+          );
+        };
+
+      image.src = src;
+    }
+  );
+}
+
 
 async function prepareTargets() {
   if (!teams.length) {
@@ -255,25 +240,64 @@ async function prepareTargets() {
     );
   }
 
+  const Compiler =
+    window.MINDAR?.Compiler ||
+    window.MINDAR?.IMAGE?.Compiler;
 
-  const targetImages =
-    teams.map(
-      team =>
-        team.targetImage
+  if (!Compiler) {
+    throw new Error(
+      'No se pudo cargar el compilador de MindAR.'
+    );
+  }
+
+  status(
+    'Preparando reconocimiento del logo…'
+  );
+
+  const images =
+    await Promise.all(
+      teams.map(team =>
+        loadImageElement(
+          team.targetImage
+        )
+      )
     );
 
+  const compiler =
+    new Compiler();
+
+  await compiler.compileImageTargets(
+    images,
+
+    progress => {
+      const value =
+        Number(progress);
+
+      const percentage =
+        Number.isFinite(value)
+          ? Math.round(
+              value <= 1
+                ? value * 100
+                : value
+            )
+          : 0;
+
+      status(
+        `Preparando reconocimiento… ${
+          Math.max(
+            0,
+            Math.min(
+              100,
+              percentage
+            )
+          )
+        }%`
+      );
+    }
+  );
 
   const buffer =
-    await compileTeamTargets(
-      targetImages,
-
-      percentage => {
-        status(
-          `Preparando reconocimiento… ${percentage}%`
-        );
-      }
-    );
-
+    await compiler.exportData();
 
   if (compiledBlobUrl) {
     URL.revokeObjectURL(
@@ -281,12 +305,10 @@ async function prepareTargets() {
     );
   }
 
-
   compiledBlobUrl =
     URL.createObjectURL(
       new Blob(
         [buffer],
-
         {
           type:
             'application/octet-stream'
@@ -294,24 +316,19 @@ async function prepareTargets() {
       )
     );
 
-
-  status(
-    'Reconocimiento preparado ✓'
-  );
-
-
   return compiledBlobUrl;
 }
 
 
-/* =========================================================
-   CONFETI
-   ========================================================= */
+/*
+  ==========================================================
+  CONFETI
+  ==========================================================
+*/
 
 function createConfetti() {
   const group =
     new THREE.Group();
-
 
   const palette = [
     0xe7d55a,
@@ -321,14 +338,12 @@ function createConfetti() {
     0x77a6d8
   ];
 
-
   const geometry =
     new THREE.BoxGeometry(
       0.028,
       0.012,
       0.006
     );
-
 
   for (
     let index = 0;
@@ -342,14 +357,9 @@ function createConfetti() {
             index %
             palette.length
           ],
-
-        roughness:
-          0.72,
-
-        metalness:
-          0.05
+        roughness: 0.72,
+        metalness: 0.05
       });
-
 
     const piece =
       new THREE.Mesh(
@@ -357,68 +367,53 @@ function createConfetti() {
         material
       );
 
-
     piece.userData.x =
-      (
-        Math.random() -
-        0.5
-      ) *
+      (Math.random() - 0.5) *
       0.9;
-
 
     piece.userData.z =
       0.12 +
       Math.random() *
       0.52;
 
-
     piece.userData.speed =
       0.22 +
       Math.random() *
       0.36;
 
-
     piece.userData.phase =
       Math.random() *
       1.2;
 
-
     piece.userData.spin =
-      (
-        Math.random() -
-        0.5
-      ) *
+      (Math.random() - 0.5) *
       5;
-
 
     group.add(
       piece
     );
   }
 
-
-  group.visible =
-    false;
-
+  group.visible = false;
 
   return group;
 }
 
 
-/* =========================================================
-   MODELO
-   ========================================================= */
+/*
+  ==========================================================
+  MODELOS
+  ==========================================================
+*/
 
 async function loadTeamModel(entry) {
   if (entry.loaded) {
     return;
   }
 
-
   if (entry.loading) {
     return entry.loading;
   }
-
 
   entry.loading =
     (async () => {
@@ -426,20 +421,16 @@ async function loadTeamModel(entry) {
         `Cargando modelo de ${entry.team.name}…`
       );
 
-
       const loader =
         new GLTFLoader();
-
 
       const gltf =
         await loader.loadAsync(
           entry.team.model
         );
 
-
       const visual =
         gltf.scene;
-
 
       const box =
         new THREE.Box3()
@@ -447,18 +438,15 @@ async function loadTeamModel(entry) {
             visual
           );
 
-
       const center =
         box.getCenter(
           new THREE.Vector3()
         );
 
-
       const size =
         box.getSize(
           new THREE.Vector3()
         );
-
 
       const maxDimension =
         Math.max(
@@ -467,11 +455,9 @@ async function loadTeamModel(entry) {
           size.z
         ) || 1;
 
-
       visual.position.sub(
         center
       );
-
 
       const requestedScale =
         Number.isFinite(
@@ -480,11 +466,9 @@ async function loadTeamModel(entry) {
           ? entry.team.modelScale
           : 0.55;
 
-
       entry.baseScale =
         requestedScale /
         maxDimension;
-
 
       entry.modelPivot
         .scale
@@ -492,88 +476,74 @@ async function loadTeamModel(entry) {
           entry.baseScale
         );
 
-
       entry.modelPivot.add(
         visual
       );
 
-
       if (
-        gltf.animations?.length
+        gltf.animations &&
+        gltf.animations.length
       ) {
         entry.mixer =
           new THREE.AnimationMixer(
             visual
           );
 
-
         entry.embeddedAction =
           entry.mixer.clipAction(
             gltf.animations[0]
           );
-
 
         entry.embeddedAction.setLoop(
           THREE.LoopOnce,
           1
         );
 
-
         entry.embeddedAction.clampWhenFinished =
           true;
       }
 
-
-      entry.loaded =
-        true;
+      entry.loaded = true;
     })();
-
 
   try {
     await entry.loading;
-
   } finally {
-    entry.loading =
-      null;
+    entry.loading = null;
   }
 }
 
 
-/* =========================================================
-   INFO
-   ========================================================= */
+/*
+  ==========================================================
+  INFORMACIÓN
+  ==========================================================
+*/
 
 function updateTeamInfo(team) {
   if (!team) {
     return;
   }
 
-
   if (teamName) {
     teamName.textContent =
       team.name;
   }
-
 
   if (infoTitle) {
     infoTitle.textContent =
       team.name;
   }
 
-
   if (infoCity) {
     infoCity.textContent =
-      team.city ||
-      '';
+      team.city || '';
   }
-
 
   if (infoCopy) {
     infoCopy.textContent =
-      team.intro ||
-      '';
+      team.intro || '';
   }
-
 
   if (historyLink) {
     historyLink.href =
@@ -584,21 +554,21 @@ function updateTeamInfo(team) {
       }`;
   }
 
-
   document.title =
     `StrikeZone | ${team.name} AR`;
 }
 
 
-/* =========================================================
-   TRANSFORMACIONES
-   ========================================================= */
+/*
+  ==========================================================
+  TRANSFORMACIONES
+  ==========================================================
+*/
 
 function applyTransform(entry) {
   if (!entry) {
     return;
   }
-
 
   if (
     entry.root &&
@@ -611,14 +581,15 @@ function applyTransform(entry) {
     );
   }
 
+  if (!entry.modelPivot) {
+    return;
+  }
 
   entry.modelPivot.rotation.x =
     entry.userRotX;
 
-
   entry.modelPivot.rotation.y =
     entry.userRotY;
-
 
   entry.modelPivot
     .scale
@@ -629,40 +600,21 @@ function applyTransform(entry) {
 }
 
 
-function resetCurrentModel() {
-  const entry =
-    currentEntry;
-
-
+function resetEntry(entry) {
   if (!entry) {
     return;
   }
 
+  entry.userScale = 1;
 
-  entry.userScale =
-    1;
+  entry.userRotX = 0;
+  entry.userRotY = 0;
 
+  entry.userPosX = 0;
+  entry.userPosY = 0;
 
-  entry.userRotX =
-    0;
-
-  entry.userRotY =
-    0;
-
-
-  entry.userPosX =
-    0;
-
-  entry.userPosY =
-    0;
-
-
-  entry.jumping =
-    false;
-
-  entry.spinning =
-    false;
-
+  entry.jumping = false;
+  entry.spinning = false;
 
   entry.root.position.set(
     0,
@@ -670,13 +622,11 @@ function resetCurrentModel() {
     entry.baseZ
   );
 
-
   entry.root.rotation.set(
     0,
     0,
     0
   );
-
 
   entry.modelPivot.rotation.set(
     0,
@@ -684,43 +634,47 @@ function resetCurrentModel() {
     0
   );
 
-
   entry.modelPivot
     .scale
     .setScalar(
       entry.baseScale
     );
 
+  if (entry.confettiOn) {
+    entry.confettiOn = false;
 
-  entry.confettiOn =
-    false;
+    entry.confettiGroup.visible =
+      false;
 
+    if (confettiBtn) {
+      confettiBtn.setAttribute(
+        'aria-pressed',
+        'false'
+      );
 
-  entry.confettiGroup.visible =
-    false;
-
-
-  if (confettiBtn) {
-    confettiBtn.setAttribute(
-      'aria-pressed',
-      'false'
-    );
-
-
-    confettiBtn.innerHTML =
-      '<span>✦</span>Efectos OFF';
+      confettiBtn.innerHTML =
+        '<span>✦</span>Efectos OFF';
+    }
   }
 }
 
 
-/* =========================================================
-   ANIMACIONES
-   ========================================================= */
+function resetCurrentModel() {
+  resetEntry(
+    currentEntry
+  );
+}
+
+
+/*
+  ==========================================================
+  ANIMACIONES
+  ==========================================================
+*/
 
 function startJump() {
   const entry =
     currentEntry;
-
 
   if (
     !entry ||
@@ -732,20 +686,13 @@ function startJump() {
     return;
   }
 
-
-  entry.jumping =
-    true;
-
+  entry.jumping = true;
 
   entry.jumpStart =
     performance.now();
 
-
-  if (
-    entry.embeddedAction
-  ) {
+  if (entry.embeddedAction) {
     entry.embeddedAction.reset();
-
     entry.embeddedAction.play();
   }
 }
@@ -754,7 +701,6 @@ function startJump() {
 function startSpin() {
   const entry =
     currentEntry;
-
 
   if (
     !entry ||
@@ -765,10 +711,7 @@ function startSpin() {
     return;
   }
 
-
-  entry.spinning =
-    true;
-
+  entry.spinning = true;
 
   entry.spinStart =
     performance.now();
@@ -779,19 +722,15 @@ function toggleConfetti() {
   const entry =
     currentEntry;
 
-
   if (!entry) {
     return;
   }
 
-
   entry.confettiOn =
     !entry.confettiOn;
 
-
   entry.confettiGroup.visible =
     entry.confettiOn;
-
 
   if (confettiBtn) {
     confettiBtn.setAttribute(
@@ -800,7 +739,6 @@ function toggleConfetti() {
         entry.confettiOn
       )
     );
-
 
     confettiBtn.innerHTML =
       `<span>✦</span>Efectos ${
@@ -812,7 +750,7 @@ function toggleConfetti() {
 }
 
 
-function updateAnimations(
+function updateEntryAnimations(
   entry,
   now,
   delta
@@ -821,26 +759,22 @@ function updateAnimations(
     return;
   }
 
-
   entry.mixer?.update(
     delta
   );
 
-
   if (
-    entry.jumping
+    entry.jumping &&
+    entry.root
   ) {
     const progress =
       Math.min(
         1,
-
         (
           now -
           entry.jumpStart
-        ) /
-        760
+        ) / 760
       );
-
 
     const arc =
       Math.sin(
@@ -848,24 +782,20 @@ function updateAnimations(
         progress
       );
 
+    const jumpHeight =
+      0.34;
 
     entry.root.position.set(
       entry.userPosX,
-
       entry.userPosY +
         arc *
-        0.34,
-
+        jumpHeight,
       entry.baseZ
     );
 
-
-    if (
-      progress >= 1
-    ) {
+    if (progress >= 1) {
       entry.jumping =
         false;
-
 
       applyTransform(
         entry
@@ -873,31 +803,25 @@ function updateAnimations(
     }
   }
 
-
   if (
-    entry.spinning
+    entry.spinning &&
+    entry.modelPivot
   ) {
     const progress =
       Math.min(
         1,
-
         (
           now -
           entry.spinStart
-        ) /
-        1500
+        ) / 1500
       );
-
 
     const eased =
       1 -
       Math.pow(
-        1 -
-        progress,
-
+        1 - progress,
         3
       );
-
 
     entry.modelPivot.rotation.y =
       entry.userRotY +
@@ -905,13 +829,9 @@ function updateAnimations(
       2 *
       eased;
 
-
-    if (
-      progress >= 1
-    ) {
+    if (progress >= 1) {
       entry.spinning =
         false;
-
 
       applyTransform(
         entry
@@ -919,41 +839,29 @@ function updateAnimations(
     }
   }
 
-
   if (
-    entry.confettiGroup.visible
+    entry.confettiGroup?.visible
   ) {
     const time =
-      now /
-      1000;
-
+      now / 1000;
 
     entry.confettiGroup
       .children
       .forEach(
-        (
-          piece,
-          index
-        ) => {
+        (piece, index) => {
           const data =
             piece.userData;
-
 
           const cycle =
             (
               data.phase +
               time *
               data.speed
-            ) %
-            1.25;
-
+            ) % 1.25;
 
           piece.position.set(
             data.x,
-
-            0.62 -
-              cycle,
-
+            0.62 - cycle,
             data.z +
               Math.sin(
                 time *
@@ -963,7 +871,6 @@ function updateAnimations(
               0.035
           );
 
-
           piece.rotation.x =
             time *
             (
@@ -972,11 +879,9 @@ function updateAnimations(
               2
             );
 
-
           piece.rotation.y =
             time *
             data.spin;
-
 
           piece.rotation.z =
             time *
@@ -990,56 +895,52 @@ function updateAnimations(
 }
 
 
-/* =========================================================
-   GESTOS
-   ========================================================= */
-
-function pointerCenter() {
-  const values =
-    [
-      ...pointers.values()
-    ];
-
-
-  if (!values.length) {
-    return null;
-  }
-
-
-  return {
-    x:
-      values.reduce(
-        (
-          total,
-          point
-        ) =>
-          total +
-          point.x,
-
-        0
-      ) /
-      values.length,
-
-    y:
-      values.reduce(
-        (
-          total,
-          point
-        ) =>
-          total +
-          point.y,
-
-        0
-      ) /
-      values.length
-  };
-}
-
+/*
+  ==========================================================
+  GESTOS
+  ==========================================================
+*/
 
 function attachGestures() {
+  const centerOfPointers =
+    () => {
+      const values =
+        [...pointers.values()];
+
+      if (!values.length) {
+        return null;
+      }
+
+      return {
+        x:
+          values.reduce(
+            (
+              total,
+              point
+            ) =>
+              total +
+              point.x,
+            0
+          ) /
+          values.length,
+
+        y:
+          values.reduce(
+            (
+              total,
+              point
+            ) =>
+              total +
+              point.y,
+            0
+          ) /
+          values.length
+      };
+    };
+
+
   container.addEventListener(
     'pointerdown',
-
     event => {
       if (
         event.target.closest(
@@ -1049,16 +950,9 @@ function attachGestures() {
         return;
       }
 
-
-      if (
-        !currentEntry ||
-        !window
-          .STRIKEZONE_TEAM_AR_STATE
-          .targetVisible
-      ) {
+      if (!currentEntry) {
         return;
       }
-
 
       container
         .setPointerCapture
@@ -1066,31 +960,21 @@ function attachGestures() {
           event.pointerId
         );
 
-
       pointers.set(
         event.pointerId,
-
         {
-          x:
-            event.clientX,
-
-          y:
-            event.clientY
+          x: event.clientX,
+          y: event.clientY
         }
       );
-
 
       if (
         pointers.size === 1
       ) {
         lastSingle = {
-          x:
-            event.clientX,
-
-          y:
-            event.clientY
+          x: event.clientX,
+          y: event.clientY
         };
-
 
         tapCandidate = {
           id:
@@ -1110,32 +994,25 @@ function attachGestures() {
         };
       }
 
-
       if (
         pointers.size === 2
       ) {
-        tapCandidate =
-          null;
+        tapCandidate = null;
 
-
-        const values =
-          [
-            ...pointers.values()
-          ];
-
+        const points =
+          [...pointers.values()];
 
         lastPinchDistance =
           Math.hypot(
-            values[0].x -
-              values[1].x,
+            points[0].x -
+              points[1].x,
 
-            values[0].y -
-              values[1].y
+            points[0].y -
+              points[1].y
           );
 
-
         lastPinchCenter =
-          pointerCenter();
+          centerOfPointers();
       }
     }
   );
@@ -1143,11 +1020,9 @@ function attachGestures() {
 
   container.addEventListener(
     'pointermove',
-
     event => {
       const entry =
         currentEntry;
-
 
       if (
         !entry ||
@@ -1161,10 +1036,8 @@ function attachGestures() {
         return;
       }
 
-
       pointers.set(
         event.pointerId,
-
         {
           x:
             event.clientX,
@@ -1173,7 +1046,6 @@ function attachGestures() {
             event.clientY
         }
       );
-
 
       if (
         tapCandidate &&
@@ -1200,30 +1072,23 @@ function attachGestures() {
           event.clientX -
           lastSingle.x;
 
-
         const dy =
           event.clientY -
           lastSingle.y;
 
-
         entry.userRotY +=
-          dx *
-          0.009;
-
+          dx * 0.009;
 
         entry.userRotX =
           Math.max(
             -1.05,
-
             Math.min(
               1.05,
-
               entry.userRotX +
                 dy *
                 0.007
             )
           );
-
 
         lastSingle = {
           x:
@@ -1233,38 +1098,27 @@ function attachGestures() {
             event.clientY
         };
 
-
         applyTransform(
           entry
         );
 
-
-        return;
-      }
-
-
-      if (
+      } else if (
         pointers.size === 2
       ) {
-        const values =
-          [
-            ...pointers.values()
-          ];
-
+        const points =
+          [...pointers.values()];
 
         const distance =
           Math.hypot(
-            values[0].x -
-              values[1].x,
+            points[0].x -
+              points[1].x,
 
-            values[0].y -
-              values[1].y
+            points[0].y -
+              points[1].y
           );
 
-
         const center =
-          pointerCenter();
-
+          centerOfPointers();
 
         if (
           lastPinchDistance >
@@ -1273,10 +1127,8 @@ function attachGestures() {
           entry.userScale =
             Math.max(
               0.38,
-
               Math.min(
                 2.5,
-
                 entry.userScale *
                   (
                     distance /
@@ -1286,7 +1138,6 @@ function attachGestures() {
             );
         }
 
-
         if (
           lastPinchCenter &&
           center
@@ -1294,10 +1145,8 @@ function attachGestures() {
           entry.userPosX =
             Math.max(
               -0.65,
-
               Math.min(
                 0.65,
-
                 entry.userPosX +
                   (
                     center.x -
@@ -1307,14 +1156,11 @@ function attachGestures() {
               )
             );
 
-
           entry.userPosY =
             Math.max(
               -0.70,
-
               Math.min(
                 0.70,
-
                 entry.userPosY -
                   (
                     center.y -
@@ -1325,14 +1171,11 @@ function attachGestures() {
             );
         }
 
-
         lastPinchDistance =
           distance;
 
-
         lastPinchCenter =
           center;
-
 
         applyTransform(
           entry
@@ -1344,7 +1187,7 @@ function attachGestures() {
 
   const endPointer =
     event => {
-      const shouldAnimate =
+      const canTap =
         tapCandidate &&
         tapCandidate.id ===
           event.pointerId &&
@@ -1357,40 +1200,27 @@ function attachGestures() {
           .STRIKEZONE_TEAM_AR_STATE
           .targetVisible;
 
-
       pointers.delete(
         event.pointerId
       );
 
-
       lastSingle =
         pointers.size === 1
-          ? [
-              ...pointers.values()
-            ][0]
-
+          ? [...pointers.values()][0]
           : null;
-
 
       if (
         pointers.size < 2
       ) {
-        lastPinchDistance =
-          0;
-
-
-        lastPinchCenter =
-          null;
+        lastPinchDistance = 0;
+        lastPinchCenter = null;
       }
 
-
-      if (shouldAnimate) {
+      if (canTap) {
         startJump();
       }
 
-
-      tapCandidate =
-        null;
+      tapCandidate = null;
     };
 
 
@@ -1398,7 +1228,6 @@ function attachGestures() {
     'pointerup',
     endPointer
   );
-
 
   container.addEventListener(
     'pointercancel',
@@ -1408,11 +1237,9 @@ function attachGestures() {
 
   container.addEventListener(
     'wheel',
-
     event => {
       const entry =
         currentEntry;
-
 
       if (
         !entry ||
@@ -1423,17 +1250,13 @@ function attachGestures() {
         return;
       }
 
-
       event.preventDefault();
-
 
       entry.userScale =
         Math.max(
           0.38,
-
           Math.min(
             2.5,
-
             entry.userScale *
               (
                 event.deltaY > 0
@@ -1443,63 +1266,49 @@ function attachGestures() {
           )
         );
 
-
       applyTransform(
         entry
       );
     },
-
     {
-      passive:
-        false
+      passive: false
     }
   );
 }
 
 
-/* =========================================================
-   CAPTURA WEBGL
+/*
+  ==========================================================
+  CAPTURA WEBGL
+  ==========================================================
 
-   Solo se llama desde team-capture.js
-   cuando el usuario presiona Capturar.
-   ========================================================= */
+  Importante:
+  se realiza un render fresco y después readPixels(),
+  antes de que el navegador descarte el framebuffer.
+*/
 
 function captureOverlay() {
   if (
-    !started ||
     !renderer ||
     !scene ||
-    !camera ||
-    !currentEntry ||
-    !window
-      .STRIKEZONE_TEAM_AR_STATE
-      .targetVisible
+    !camera
   ) {
     return null;
   }
 
-
-  /*
-    Render fresco del estado exacto:
-    modelo + posición + rotación + confeti.
-  */
   renderer.render(
     scene,
     camera
   );
 
-
   const source =
     renderer.domElement;
-
 
   const width =
     source.width;
 
-
   const height =
     source.height;
-
 
   if (
     !width ||
@@ -1508,17 +1317,8 @@ function captureOverlay() {
     return null;
   }
 
-
   const gl =
     renderer.getContext();
-
-
-  /*
-    Esperar a que la GPU termine el frame
-    antes de leerlo.
-  */
-  gl.finish();
-
 
   const pixels =
     new Uint8Array(
@@ -1526,7 +1326,6 @@ function captureOverlay() {
       height *
       4
     );
-
 
   gl.readPixels(
     0,
@@ -1538,31 +1337,25 @@ function captureOverlay() {
     pixels
   );
 
-
   const snapshot =
     document.createElement(
       'canvas'
     );
 
-
   snapshot.width =
     width;
 
-
   snapshot.height =
     height;
-
 
   const context =
     snapshot.getContext(
       '2d'
     );
 
-
   if (!context) {
     return null;
   }
-
 
   const imageData =
     context.createImageData(
@@ -1570,52 +1363,39 @@ function captureOverlay() {
       height
     );
 
-
-  const rowSize =
-    width *
-    4;
-
+  const rowBytes =
+    width * 4;
 
   /*
-    WebGL:
-    origen inferior izquierdo.
-
-    Canvas:
-    origen superior izquierdo.
-
-    Invertimos las filas.
+    WebGL entrega los píxeles de abajo hacia arriba.
+    Aquí invertimos verticalmente cada fila.
   */
   for (
     let y = 0;
     y < height;
     y += 1
   ) {
-    const sourceOffset =
+    const sourceStart =
       (
         height -
         1 -
         y
       ) *
-      rowSize;
+      rowBytes;
 
-
-    const targetOffset =
+    const destinationStart =
       y *
-      rowSize;
-
+      rowBytes;
 
     imageData.data.set(
       pixels.subarray(
-        sourceOffset,
-
-        sourceOffset +
-        rowSize
+        sourceStart,
+        sourceStart +
+          rowBytes
       ),
-
-      targetOffset
+      destinationStart
     );
   }
-
 
   context.putImageData(
     imageData,
@@ -1623,11 +1403,8 @@ function captureOverlay() {
     0
   );
 
-
   const rect =
-    source
-      .getBoundingClientRect();
-
+    source.getBoundingClientRect();
 
   return {
     canvas:
@@ -1650,43 +1427,40 @@ function captureOverlay() {
 }
 
 
-/*
-  API exclusivamente para team-capture.js.
-*/
-window.STRIKEZONE_TEAM_CAPTURE = {
+window.STRIKEZONE_AR_CAPTURE = {
   captureOverlay
 };
 
 
-/* =========================================================
-   TARGET ENCONTRADO
-   ========================================================= */
+/*
+  ==========================================================
+  TARGET ENCONTRADO / PERDIDO
+  ==========================================================
+*/
 
 async function teamFound(entry) {
   currentTeam =
     entry.team;
 
+  currentRoot =
+    entry.root;
 
   currentEntry =
     entry;
-
 
   window
     .STRIKEZONE_TEAM_AR_STATE
     .team =
       entry.team;
 
-
   window
     .STRIKEZONE_TEAM_AR_STATE
     .targetVisible =
       true;
 
-
   updateTeamInfo(
     entry.team
   );
-
 
   entries.forEach(
     item => {
@@ -1699,16 +1473,13 @@ async function teamFound(entry) {
     }
   );
 
-
   try {
     await loadTeamModel(
       entry
     );
 
-
     if (
-      currentEntry !==
-        entry ||
+      currentEntry !== entry ||
       !window
         .STRIKEZONE_TEAM_AR_STATE
         .targetVisible
@@ -1716,40 +1487,49 @@ async function teamFound(entry) {
       return;
     }
 
-
     entry.root.visible =
       true;
-
 
     if (helpEl) {
       helpEl.hidden =
         true;
     }
 
-
     if (controlsEl) {
       controlsEl.hidden =
         false;
     }
 
-
     if (gestureTip) {
       gestureTip.hidden =
         false;
 
-
-      window.setTimeout(
+      setTimeout(
         () => {
           if (gestureTip) {
             gestureTip.hidden =
               true;
           }
         },
-
         4200
       );
     }
 
+    if (confettiBtn) {
+      confettiBtn.setAttribute(
+        'aria-pressed',
+        String(
+          entry.confettiOn
+        )
+      );
+
+      confettiBtn.innerHTML =
+        `<span>✦</span>Efectos ${
+          entry.confettiOn
+            ? 'ON'
+            : 'OFF'
+        }`;
+    }
 
     status(
       `${entry.team.name} reconocido ✓`
@@ -1761,10 +1541,8 @@ async function teamFound(entry) {
       error
     );
 
-
     entry.root.visible =
       false;
-
 
     status(
       `No se pudo cargar el modelo de ${entry.team.name}.`
@@ -1773,85 +1551,66 @@ async function teamFound(entry) {
 }
 
 
-/* =========================================================
-   TARGET PERDIDO
-   ========================================================= */
-
 function teamLost(entry) {
   entry.root.visible =
     false;
 
-
   if (
-    currentEntry !== entry
+    currentEntry === entry
   ) {
-    return;
+    window
+      .STRIKEZONE_TEAM_AR_STATE
+      .targetVisible =
+        false;
+
+    currentRoot = null;
+
+    if (controlsEl) {
+      controlsEl.hidden =
+        true;
+    }
+
+    if (gestureTip) {
+      gestureTip.hidden =
+        true;
+    }
+
+    if (infoPanel) {
+      infoPanel.hidden =
+        true;
+    }
+
+    if (helpEl) {
+      helpEl.hidden =
+        false;
+    }
+
+    status(
+      'Apunta nuevamente al logo del equipo'
+    );
   }
-
-
-  window
-    .STRIKEZONE_TEAM_AR_STATE
-    .targetVisible =
-      false;
-
-
-  if (controlsEl) {
-    controlsEl.hidden =
-      true;
-  }
-
-
-  if (gestureTip) {
-    gestureTip.hidden =
-      true;
-  }
-
-
-  if (infoPanel) {
-    infoPanel.hidden =
-      true;
-  }
-
-
-  if (helpEl) {
-    helpEl.hidden =
-      false;
-  }
-
-
-  status(
-    'Apunta nuevamente al logo del equipo'
-  );
 }
 
 
-/* =========================================================
-   ANCHORS
-   ========================================================= */
+/*
+  ==========================================================
+  ANCHORS
+  ==========================================================
+*/
 
 function configureAnchors() {
-  entries.length =
-    0;
-
-
   teams.forEach(
-    (
-      team,
-      index
-    ) => {
+    (team, index) => {
       const anchor =
         mindarThree.addAnchor(
           index
         );
 
-
       const root =
         new THREE.Group();
 
-
       root.visible =
         false;
-
 
       const baseZ =
         Number.isFinite(
@@ -1860,33 +1619,26 @@ function configureAnchors() {
           ? team.baseZ
           : 0.18;
 
-
       root.position.z =
         baseZ;
-
 
       const modelPivot =
         new THREE.Group();
 
-
       const confettiGroup =
         createConfetti();
-
 
       root.add(
         modelPivot
       );
 
-
       root.add(
         confettiGroup
       );
 
-
       anchor.group.add(
         root
       );
-
 
       const entry = {
         team,
@@ -1895,59 +1647,35 @@ function configureAnchors() {
         modelPivot,
         confettiGroup,
 
-        loaded:
-          false,
+        loaded: false,
+        loading: null,
 
-        loading:
-          null,
+        mixer: null,
+        embeddedAction: null,
 
-        mixer:
-          null,
-
-        embeddedAction:
-          null,
-
-        baseScale:
-          1,
-
+        baseScale: 1,
         baseZ,
 
-        userScale:
-          1,
+        userScale: 1,
 
-        userRotX:
-          0,
+        userRotX: 0,
+        userRotY: 0,
 
-        userRotY:
-          0,
+        userPosX: 0,
+        userPosY: 0,
 
-        userPosX:
-          0,
+        jumping: false,
+        jumpStart: 0,
 
-        userPosY:
-          0,
+        spinning: false,
+        spinStart: 0,
 
-        jumping:
-          false,
-
-        jumpStart:
-          0,
-
-        spinning:
-          false,
-
-        spinStart:
-          0,
-
-        confettiOn:
-          false
+        confettiOn: false
       };
-
 
       entries.push(
         entry
       );
-
 
       anchor.onTargetFound =
         () => {
@@ -1955,7 +1683,6 @@ function configureAnchors() {
             entry
           );
         };
-
 
       anchor.onTargetLost =
         () => {
@@ -1968,54 +1695,32 @@ function configureAnchors() {
 }
 
 
-/* =========================================================
-   INICIO LIMPIO DE MINDAR
-   ========================================================= */
+/*
+  ==========================================================
+  INICIO AR
+  ==========================================================
+*/
 
 async function startAR() {
-  if (
-    starting ||
-    started
-  ) {
+  if (started) {
     return;
   }
 
-
-  starting =
-    true;
-
-
   hideError();
-
 
   if (startBtn) {
     startBtn.disabled =
       true;
   }
 
-
   try {
-    /*
-      1.
-      Compiler aislado.
-
-      Cuando termine, su iframe ya habrá
-      desaparecido.
-    */
     const targetSource =
       await prepareTargets();
-
 
     status(
       'Inicializando cámara…'
     );
 
-
-    /*
-      2.
-      AQUÍ se crea la única instancia MindARThree
-      del documento principal.
-    */
     mindarThree =
       new MindARThree({
         container,
@@ -2023,19 +1728,12 @@ async function startAR() {
         imageTargetSrc:
           targetSource,
 
-        maxTrack:
-          1,
+        maxTrack: 1,
 
-        uiLoading:
-          'no',
-
-        uiScanning:
-          'no',
-
-        uiError:
-          'no'
+        uiLoading: 'no',
+        uiScanning: 'no',
+        uiError: 'no'
       });
-
 
     ({
       renderer,
@@ -2043,31 +1741,14 @@ async function startAR() {
       camera
     } = mindarThree);
 
-
-    /*
-      Mantener fondo transparente.
-      El video de cámara está debajo.
-    */
-    renderer.setClearColor(
-      0x000000,
-      0
-    );
-
-
     renderer.setPixelRatio(
       Math.min(
         window.devicePixelRatio ||
           1,
-
         2
       )
     );
 
-
-    /*
-      Iluminación del flujo original
-      que ya funcionaba.
-    */
     scene.add(
       new THREE.HemisphereLight(
         0xffffff,
@@ -2076,75 +1757,48 @@ async function startAR() {
       )
     );
 
-
     const directional =
       new THREE.DirectionalLight(
         0xffffff,
-        2.3
+        2.4
       );
 
-
     directional.position.set(
-      1.5,
+      1.4,
       2,
-      2.5
+      2.3
     );
-
 
     scene.add(
       directional
     );
 
-
-    /*
-      Anchors antes del start,
-      igual que el flujo probado.
-    */
     configureAnchors();
 
-
-    /*
-      3.
-      Cámara.
-
-      Nada del sistema de captura se ejecuta aquí.
-    */
     await mindarThree.start();
 
-
-    started =
-      true;
-
-
-    starting =
-      false;
-
+    started = true;
 
     if (startPanel) {
       startPanel.hidden =
         true;
     }
 
-
     if (helpEl) {
       helpEl.hidden =
         false;
     }
 
-
     status(
       'Apunta al logo del equipo'
     );
 
-
     clock.start();
-
 
     renderer.setAnimationLoop(
       () => {
         const now =
           performance.now();
-
 
         const delta =
           Math.min(
@@ -2152,20 +1806,18 @@ async function startAR() {
             0.05
           );
 
-
         if (
           currentEntry &&
           window
             .STRIKEZONE_TEAM_AR_STATE
             .targetVisible
         ) {
-          updateAnimations(
+          updateEntryAnimations(
             currentEntry,
             now,
             delta
           );
         }
-
 
         renderer.render(
           scene,
@@ -2175,66 +1827,62 @@ async function startAR() {
     );
 
   } catch (error) {
-    starting =
-      false;
-
-
-    started =
-      false;
-
-
     console.error(
       'Error iniciando Team AR:',
       error
     );
 
-
     /*
-      MUY IMPORTANTE:
-
-      No llamar:
-      mindarThree.stop()
-
-      Si start() falló antes de crear controller,
-      MindAR lanza stopProcessVideo undefined.
+      Si start() falla antes de crear por completo el controller
+      interno de MindAR, llamar stop() provoca stopProcessVideo
+      undefined. No intentamos reutilizar esa instancia parcial.
+      El reintento recarga el documento completo.
     */
+    renderer
+      ?.setAnimationLoop(
+        null
+      );
 
+    mindarThree = null;
+    renderer = null;
+    scene = null;
+    camera = null;
+
+    started = false;
 
     if (startBtn) {
       startBtn.disabled =
         false;
     }
 
-
     showError(
       error?.message ||
-      'No se pudo iniciar la cámara AR. Pulsa Recargar y reintentar.'
+      'No se pudo iniciar la cámara AR. Recarga y vuelve a intentarlo.'
     );
   }
 }
 
 
-/* =========================================================
-   EVENTOS
-   ========================================================= */
+/*
+  ==========================================================
+  EVENTOS
+  ==========================================================
+*/
 
 jumpBtn?.addEventListener(
   'click',
   startJump
 );
 
-
 spinBtn?.addEventListener(
   'click',
   startSpin
 );
 
-
 confettiBtn?.addEventListener(
   'click',
   toggleConfetti
 );
-
 
 resetBtn?.addEventListener(
   'click',
@@ -2244,7 +1892,6 @@ resetBtn?.addEventListener(
 
 infoBtn?.addEventListener(
   'click',
-
   () => {
     if (
       !currentTeam ||
@@ -2252,7 +1899,6 @@ infoBtn?.addEventListener(
     ) {
       return;
     }
-
 
     infoPanel.hidden =
       !infoPanel.hidden;
@@ -2262,7 +1908,6 @@ infoBtn?.addEventListener(
 
 infoClose?.addEventListener(
   'click',
-
   () => {
     if (infoPanel) {
       infoPanel.hidden =
@@ -2274,23 +1919,14 @@ infoClose?.addEventListener(
 
 startBtn?.addEventListener(
   'click',
-
   () => {
     void startAR();
   }
 );
 
 
-/*
-  Un start() fallido puede dejar listeners
-  internos de MindAR.
-
-  El único retry verdaderamente limpio
-  es crear un documento nuevo.
-*/
 retryBtn?.addEventListener(
   'click',
-
   () => {
     window.location.reload();
   }
@@ -2300,48 +1936,22 @@ retryBtn?.addEventListener(
 attachGestures();
 
 
-/* =========================================================
-   SALIDA
-   ========================================================= */
-
 window.addEventListener(
   'pagehide',
-
   () => {
     renderer
       ?.setAnimationLoop(
         null
       );
 
-
-    /*
-      Solo intentar stop() si start()
-      sí terminó.
-    */
-    if (
-      started &&
-      mindarThree
-    ) {
-      try {
-        const result =
-          mindarThree.stop();
-
-
-        result?.catch?.(
-          () => {}
-        );
-
-      } catch {
-        // Sin acción.
-      }
-    }
-
+    mindarThree
+      ?.stop
+      ?.();
 
     if (compiledBlobUrl) {
       URL.revokeObjectURL(
         compiledBlobUrl
       );
-
 
       compiledBlobUrl =
         '';
