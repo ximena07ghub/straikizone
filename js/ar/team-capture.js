@@ -29,12 +29,14 @@
       '[data-capture-login-close]'
     );
 
+
   if (
     !container ||
     !button
   ) {
     return;
   }
+
 
   let saving = false;
 
@@ -65,7 +67,8 @@
     notify.timer =
       setTimeout(
         () => {
-          message.hidden = true;
+          message.hidden =
+            true;
         },
         3500
       );
@@ -105,37 +108,47 @@
   closeLogin?.addEventListener(
     'click',
     () => {
-      loginBox.hidden = true;
+      if (loginBox) {
+        loginBox.hidden =
+          true;
+      }
     }
   );
 
 
-  function getLayers() {
-    const video =
-      container.querySelector(
-        'video'
-      );
+  /*
+    Obtener exclusivamente el video real.
+    El canvas AR ya no se busca manualmente:
+    lo entrega team-viewer.js.
+  */
+  function getVideo() {
+    return container.querySelector(
+      'video'
+    );
+  }
 
-    const canvases = [
-      ...container.querySelectorAll(
-        'canvas'
-      )
-    ];
 
-    const overlay =
-      canvases.find(
-        canvas =>
-          canvas.width > 0 &&
-          canvas.height > 0 &&
-          getComputedStyle(
-            canvas
-          ).display !== 'none'
-      );
+  /*
+    Tomar un frame WebGL fresco del viewer.
 
-    return {
-      video,
-      overlay
-    };
+    Ese frame contiene:
+    - modelo 3D
+    - animación en su posición actual
+    - confeti si está activo
+
+    No contiene:
+    - botones HTML
+    - barra superior
+    - panel Info
+  */
+  function getAROverlay() {
+    return (
+      window
+        .STRIKEZONE_AR_CAPTURE
+        ?.captureOverlay
+        ?.() ||
+      null
+    );
   }
 
 
@@ -152,6 +165,7 @@
     const videoHeight =
       video.videoHeight;
 
+
     if (
       !videoWidth ||
       !videoHeight
@@ -161,23 +175,29 @@
       );
     }
 
+
     const destinationX =
       (
         rect.left -
         baseRect.left
-      ) * ratio;
+      ) *
+      ratio;
 
     const destinationY =
       (
         rect.top -
         baseRect.top
-      ) * ratio;
+      ) *
+      ratio;
 
     const destinationWidth =
-      rect.width * ratio;
+      rect.width *
+      ratio;
 
     const destinationHeight =
-      rect.height * ratio;
+      rect.height *
+      ratio;
+
 
     const scale =
       Math.max(
@@ -188,6 +208,7 @@
           videoHeight
       );
 
+
     const cropWidth =
       destinationWidth /
       scale;
@@ -195,6 +216,7 @@
     const cropHeight =
       destinationHeight /
       scale;
+
 
     const sourceX =
       (
@@ -207,6 +229,7 @@
         videoHeight -
         cropHeight
       ) / 2;
+
 
     context.drawImage(
       video,
@@ -225,25 +248,28 @@
 
 
   function composeCapture() {
-    const {
-      video,
-      overlay
-    } = getLayers();
+    const video =
+      getVideo();
+
+    const overlay =
+      getAROverlay();
+
 
     if (
       !video ||
-      !overlay ||
       video.readyState <
         HTMLMediaElement.HAVE_CURRENT_DATA
     ) {
       throw new Error(
-        'La cámara y el modelo AR todavía no están listos.'
+        'La cámara todavía no está lista.'
       );
     }
+
 
     const arState =
       window
         .STRIKEZONE_TEAM_AR_STATE;
+
 
     if (
       !arState?.team ||
@@ -254,6 +280,17 @@
       );
     }
 
+
+    if (
+      !overlay?.canvas ||
+      !overlay?.rect
+    ) {
+      throw new Error(
+        'No se pudo capturar el modelo 3D.'
+      );
+    }
+
+
     const bounds =
       container
         .getBoundingClientRect();
@@ -263,8 +300,8 @@
         .getBoundingClientRect();
 
     const overlayRect =
-      overlay
-        .getBoundingClientRect();
+      overlay.rect;
+
 
     if (
       !bounds.width ||
@@ -277,16 +314,20 @@
       );
     }
 
+
     const ratio =
       Math.min(
-        devicePixelRatio || 1,
+        window.devicePixelRatio ||
+          1,
         2
       );
+
 
     const canvas =
       document.createElement(
         'canvas'
       );
+
 
     canvas.width =
       Math.round(
@@ -300,6 +341,7 @@
         ratio
       );
 
+
     const context =
       canvas.getContext(
         '2d',
@@ -308,13 +350,17 @@
         }
       );
 
+
     if (!context) {
       throw new Error(
         'No se pudo crear la fotografía.'
       );
     }
 
-    // Cámara.
+
+    /*
+      1. Cámara real.
+    */
     drawVideo(
       context,
       video,
@@ -323,26 +369,32 @@
       ratio
     );
 
-    // Modelo AR.
+
+    /*
+      2. Modelo 3D + efectos WebGL.
+    */
     context.drawImage(
-      overlay,
+      overlay.canvas,
 
       (
         overlayRect.left -
         bounds.left
-      ) * ratio,
+      ) *
+      ratio,
 
       (
         overlayRect.top -
         bounds.top
-      ) * ratio,
+      ) *
+      ratio,
 
       overlayRect.width *
-        ratio,
+      ratio,
 
       overlayRect.height *
-        ratio
+      ratio
     );
+
 
     return canvas;
   }
@@ -350,14 +402,20 @@
 
   function toBlob(canvas) {
     return new Promise(
-      (resolve, reject) => {
+      (
+        resolve,
+        reject
+      ) => {
         canvas.toBlob(
           blob => {
             if (
               blob &&
               blob.size
             ) {
-              resolve(blob);
+              resolve(
+                blob
+              );
+
             } else {
               reject(
                 new Error(
@@ -379,8 +437,10 @@
       return;
     }
 
+
     const session =
       validSession();
+
 
     if (!session?.id) {
       requestLogin();
@@ -393,9 +453,11 @@
       return;
     }
 
+
     const arState =
       window
         .STRIKEZONE_TEAM_AR_STATE;
+
 
     if (
       !arState?.team ||
@@ -408,6 +470,7 @@
 
       return;
     }
+
 
     if (
       !window
@@ -422,20 +485,31 @@
       return;
     }
 
+
     saving = true;
-    button.disabled = true;
+
+    button.disabled =
+      true;
+
 
     try {
+      /*
+        composeCapture solicita primero un
+        render WebGL fresco.
+      */
       const canvas =
         composeCapture();
+
 
       const blob =
         await toBlob(
           canvas
         );
 
+
       const team =
         arState.team;
+
 
       const metadata = {
         source:
@@ -457,6 +531,7 @@
           Date.now()
       };
 
+
       const id =
         await window
           .StrikeZonePhotos
@@ -466,11 +541,13 @@
             metadata
           );
 
+
       if (id == null) {
         throw new Error(
           'IndexedDB no confirmó el guardado.'
         );
       }
+
 
       notify(
         `Foto de ${team.name} guardada en Mis Medios.`
@@ -482,6 +559,7 @@
         error
       );
 
+
       notify(
         error?.message ||
         'No se pudo guardar la fotografía.',
@@ -490,7 +568,9 @@
 
     } finally {
       saving = false;
-      button.disabled = false;
+
+      button.disabled =
+        false;
     }
   }
 

@@ -17,11 +17,6 @@
     href="css/ar/card.css"
   >
 
-  <!--
-    Compiler de MindAR.
-    Se utiliza para convertir los logos registrados
-    en targets reconocibles.
-  -->
   <script
     src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.1.4/dist/mindar-image.prod.js"
   ></script>
@@ -42,14 +37,18 @@
       aspect-ratio: 1 / 1;
     }
 
+    /*
+      Seis controles:
+      2 filas x 3 columnas.
+    */
     .team-controls {
       grid-template-columns:
         repeat(3, minmax(0, 1fr)) !important;
     }
 
     /*
-      Mantener Info compacto.
-      No debe cubrir la mayor parte de la cámara.
+      El panel Info permanece compacto para
+      no cubrir la mayor parte de la cámara.
     */
     .team-info-panel {
       width:
@@ -91,7 +90,7 @@
     @media (min-width: 700px) {
       .team-controls {
         width:
-          min(520px, calc(100% - 30px));
+          min(700px, calc(100% - 30px));
       }
     }
   </style>
@@ -136,7 +135,7 @@
     </div>
 
 
-    <!-- Área visual de reconocimiento -->
+    <!-- Área de reconocimiento -->
     <div
       class="ar-reticle team-reticle"
       aria-hidden="true"
@@ -159,7 +158,7 @@
     </div>
 
 
-    <!-- Inicio -->
+    <!-- Pantalla inicial -->
     <section
       class="ar-start"
       data-ar-start-panel
@@ -178,6 +177,11 @@
           Apunta la cámara al logo de un equipo registrado.
           Cuando StrikeZone lo reconozca, aparecerá su
           modelo 3D sobre el logo.
+        </p>
+
+        <p>
+          Puedes girarlo, moverlo, acercarlo, activar
+          animaciones y añadir efectos.
         </p>
 
         <button
@@ -209,7 +213,17 @@
     </section>
 
 
-    <!-- Información compacta -->
+    <!-- Guía de gestos -->
+    <div
+      class="ar-gesture-tip"
+      data-gesture-tip
+      hidden
+    >
+      1 dedo: gira · 2 dedos: mueve y zoom · toque: animar
+    </div>
+
+
+    <!-- Información del equipo -->
     <section
       class="ar-info-panel team-info-panel"
       data-info-panel
@@ -250,16 +264,21 @@
     </section>
 
 
-    <!--
-      Solo los controles necesarios.
-      No hay efectos AR.
-    -->
+    <!-- Controles AR -->
     <nav
       class="ar-controls team-controls"
-      aria-label="Controles AR"
+      aria-label="Controles del modelo"
       data-ar-controls
       hidden
     >
+
+      <button
+        type="button"
+        data-jump
+      >
+        <span>▶</span>
+        Animar
+      </button>
 
       <button
         type="button"
@@ -267,6 +286,23 @@
       >
         <span>ⓘ</span>
         Info
+      </button>
+
+      <button
+        type="button"
+        data-confetti
+        aria-pressed="false"
+      >
+        <span>✦</span>
+        Efectos OFF
+      </button>
+
+      <button
+        type="button"
+        data-spin
+      >
+        <span>↻</span>
+        360°
       </button>
 
       <button
@@ -288,7 +324,7 @@
     </nav>
 
 
-    <!-- Resultado del guardado -->
+    <!-- Resultado de captura -->
     <div
       class="ar-capture-message"
       data-capture-message
@@ -358,7 +394,7 @@
   <script src="js/collection/rewards.js"></script>
   <script src="js/media/photo-db.js"></script>
 
-  <!-- AR de equipos -->
+  <!-- AR -->
   <script
     type="module"
     src="js/ar/team-viewer.js"
