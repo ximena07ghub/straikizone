@@ -12,30 +12,59 @@
 
   <title>StrikeZone | Equipos AR</title>
 
+  <!-- Estilos generales del módulo AR -->
   <link
     rel="stylesheet"
     href="css/ar/card.css"
   >
 
+  <!--
+    ========================================================
+    COMPILADOR MINDAR
+    ========================================================
+
+    IMPORTANTE:
+    Se conserva la versión 1.1.4 porque es la versión
+    que proporciona window.MINDAR.Compiler utilizado
+    por team-viewer.js para compilar los logos de los
+    equipos como targets AR.
+  -->
   <script
-  src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image.prod.js"
-></script>
+    src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.1.4/dist/mindar-image.prod.js"
+  ></script>
 
-<script type="importmap">
-{
-  "imports": {
-    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/",
-    "mindar-image-three": "https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js"
+
+  <!--
+    ========================================================
+    THREE.JS + RUNTIME MINDAR
+    ========================================================
+
+    Este importmap es utilizado por team-viewer.js,
+    que se carga como módulo.
+  -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/",
+      "mindar-image-three": "https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js"
+    }
   }
-}
-</script>
+  </script>
 
+
+  <!--
+    ========================================================
+    AJUSTES ESPECÍFICOS DE EQUIPOS AR
+    ========================================================
+  -->
   <style>
+
     .team-reticle {
       width: min(74vw, 380px);
       aspect-ratio: 1 / 1;
     }
+
 
     /*
       Seis controles:
@@ -46,9 +75,10 @@
         repeat(3, minmax(0, 1fr)) !important;
     }
 
+
     /*
-      El panel Info permanece compacto para
-      no cubrir la mayor parte de la cámara.
+      Panel de información compacto para evitar
+      cubrir demasiado espacio de la cámara.
     */
     .team-info-panel {
       width:
@@ -62,13 +92,16 @@
       overflow-y: auto;
     }
 
+
     .team-info-panel h2 {
       padding-right: 35px;
     }
 
+
     .team-info-city {
       font-weight: 800;
     }
+
 
     .team-history-link {
       display: inline-flex;
@@ -83,28 +116,45 @@
       text-decoration: none;
     }
 
+
     .team-history-link:hover {
       text-decoration: underline;
     }
 
+
+    /*
+      Ajuste para tablet/escritorio.
+    */
     @media (min-width: 700px) {
       .team-controls {
         width:
           min(700px, calc(100% - 30px));
       }
     }
+
   </style>
 </head>
 
+
 <body>
 
+  <!--
+    ========================================================
+    CONTENEDOR PRINCIPAL AR
+    ========================================================
+  -->
   <main
     id="ar-container"
     class="ar-camera"
     aria-label="Escáner AR de equipos"
   >
 
-    <!-- Barra superior -->
+
+    <!--
+      ======================================================
+      BARRA SUPERIOR
+      ======================================================
+    -->
     <div class="ar-topbar">
 
       <a
@@ -115,7 +165,9 @@
         ←
       </a>
 
+
       <div class="ar-heading">
+
         <span>
           STRIKEZONE · EQUIPOS AR
         </span>
@@ -123,7 +175,9 @@
         <strong data-team-name>
           Escáner de equipos
         </strong>
+
       </div>
+
 
       <a
         class="ar-card-link"
@@ -135,7 +189,12 @@
     </div>
 
 
-    <!-- Área de reconocimiento -->
+
+    <!--
+      ======================================================
+      ÁREA VISUAL DE RECONOCIMIENTO
+      ======================================================
+    -->
     <div
       class="ar-reticle team-reticle"
       aria-hidden="true"
@@ -147,7 +206,12 @@
     </div>
 
 
-    <!-- Estado -->
+
+    <!--
+      ======================================================
+      ESTADO DEL ESCÁNER
+      ======================================================
+    -->
     <div
       class="ar-status"
       data-ar-status
@@ -158,20 +222,28 @@
     </div>
 
 
-    <!-- Pantalla inicial -->
+
+    <!--
+      ======================================================
+      PANTALLA INICIAL
+      ======================================================
+    -->
     <section
       class="ar-start"
       data-ar-start-panel
     >
+
       <div class="ar-start-card">
 
         <span class="ar-kicker">
           STRIKEZONE · RECONOCIMIENTO DE LOGOS
         </span>
 
+
         <h1>
           Escanea un equipo
         </h1>
+
 
         <p>
           Apunta la cámara al logo de un equipo registrado.
@@ -179,10 +251,12 @@
           modelo 3D sobre el logo.
         </p>
 
+
         <p>
           Puedes girarlo, moverlo, acercarlo, activar
           animaciones y añadir efectos.
         </p>
+
 
         <button
           class="ar-primary"
@@ -193,15 +267,22 @@
         </button>
 
       </div>
+
     </section>
 
 
-    <!-- Ayuda -->
+
+    <!--
+      ======================================================
+      AYUDA DE ESCANEO
+      ======================================================
+    -->
     <section
       class="ar-help"
       data-ar-help
       hidden
     >
+
       <strong>
         Apunta al logo del equipo
       </strong>
@@ -210,20 +291,33 @@
         Mantén el logo completo, estable
         y bien iluminado.
       </span>
+
     </section>
 
 
-    <!-- Guía de gestos -->
+
+    <!--
+      ======================================================
+      AYUDA DE GESTOS
+      ======================================================
+    -->
     <div
       class="ar-gesture-tip"
       data-gesture-tip
       hidden
     >
-      1 dedo: gira · 2 dedos: mueve y zoom · toque: animar
+      1 dedo: gira ·
+      2 dedos: mueve y zoom ·
+      toque: animar
     </div>
 
 
-    <!-- Información del equipo -->
+
+    <!--
+      ======================================================
+      INFORMACIÓN DEL EQUIPO
+      ======================================================
+    -->
     <section
       class="ar-info-panel team-info-panel"
       data-info-panel
@@ -238,20 +332,25 @@
         ×
       </button>
 
+
       <span class="ar-kicker">
         INFORMACIÓN DEL EQUIPO
       </span>
 
+
       <h2 data-info-title>
         Equipo
       </h2>
+
 
       <p
         class="team-info-city"
         data-info-city
       ></p>
 
+
       <p data-info-copy></p>
+
 
       <a
         class="team-history-link"
@@ -264,7 +363,12 @@
     </section>
 
 
-    <!-- Controles AR -->
+
+    <!--
+      ======================================================
+      CONTROLES DEL MODELO AR
+      ======================================================
+    -->
     <nav
       class="ar-controls team-controls"
       aria-label="Controles del modelo"
@@ -272,6 +376,8 @@
       hidden
     >
 
+
+      <!-- Animación -->
       <button
         type="button"
         data-jump
@@ -280,6 +386,8 @@
         Animar
       </button>
 
+
+      <!-- Información -->
       <button
         type="button"
         data-info
@@ -288,6 +396,8 @@
         Info
       </button>
 
+
+      <!-- Confeti -->
       <button
         type="button"
         data-confetti
@@ -297,6 +407,8 @@
         Efectos OFF
       </button>
 
+
+      <!-- Giro 360 -->
       <button
         type="button"
         data-spin
@@ -305,6 +417,8 @@
         360°
       </button>
 
+
+      <!-- Reiniciar -->
       <button
         type="button"
         data-reset
@@ -313,6 +427,8 @@
         Reiniciar
       </button>
 
+
+      <!-- Captura -->
       <button
         type="button"
         data-ar-capture
@@ -324,7 +440,12 @@
     </nav>
 
 
-    <!-- Resultado de captura -->
+
+    <!--
+      ======================================================
+      MENSAJE DE CAPTURA
+      ======================================================
+    -->
     <div
       class="ar-capture-message"
       data-capture-message
@@ -334,16 +455,23 @@
     ></div>
 
 
-    <!-- Login -->
+
+    <!--
+      ======================================================
+      AVISO DE LOGIN PARA GUARDAR CAPTURA
+      ======================================================
+    -->
     <div
       class="ar-capture-login"
       data-capture-login
       hidden
     >
+
       <p>
         Inicia sesión para guardar
         la captura en Mis Medios.
       </p>
+
 
       <a
         href="login.html"
@@ -352,29 +480,39 @@
         Iniciar sesión
       </a>
 
+
       <button
         type="button"
         data-capture-login-close
       >
         Cerrar
       </button>
+
     </div>
 
 
-    <!-- Errores -->
+
+    <!--
+      ======================================================
+      ERROR DEL ESCÁNER
+      ======================================================
+    -->
     <div
       class="ar-error"
       data-ar-error
       hidden
     >
+
       <strong>
         No se pudo iniciar el escáner de equipos.
       </strong>
+
 
       <span data-ar-error-text>
         Revisa el permiso de cámara
         y vuelve a intentarlo.
       </span>
+
 
       <button
         type="button"
@@ -382,25 +520,91 @@
       >
         Intentar de nuevo
       </button>
+
     </div>
 
   </main>
 
 
-  <!-- Catálogo de equipos -->
-  <script src="js/history/history.js"></script>
 
-  <!-- Sesión y Mis Medios -->
-  <script src="js/collection/rewards.js"></script>
-  <script src="js/media/photo-db.js"></script>
+  <!--
+    ========================================================
+    DATOS DE LOS EQUIPOS
+    ========================================================
 
-  <!-- AR -->
+    IMPORTANTE:
+
+    history.js debe cargarse ANTES de team-viewer.js.
+
+    history.js crea:
+    window.STRIKEZONE_TEAMS
+
+    Ahí están:
+    - targetImage
+    - model
+    - modelScale
+    - nombre
+    - ciudad
+    - información histórica
+  -->
+  <script
+    src="js/history/history.js"
+  ></script>
+
+
+
+  <!--
+    ========================================================
+    SESIÓN / RECOMPENSAS
+    ========================================================
+  -->
+  <script
+    src="js/collection/rewards.js"
+  ></script>
+
+
+
+  <!--
+    ========================================================
+    BASE DE DATOS DE FOTOS
+    ========================================================
+  -->
+  <script
+    src="js/media/photo-db.js"
+  ></script>
+
+
+
+  <!--
+    ========================================================
+    MOTOR AR DE EQUIPOS
+    ========================================================
+
+    Este archivo:
+    - compila los 10 logos
+    - inicia MindAR
+    - reconoce los equipos
+    - carga los GLB
+    - administra gestos
+    - animaciones
+    - efectos
+    - proporciona captureOverlay()
+
+    IMPORTANTE:
+    Se carga como módulo.
+  -->
   <script
     type="module"
     src="js/ar/team-viewer.js"
   ></script>
 
-  <script src="js/ar/team-capture.js"></script>
+
+
+
+  <script
+    src="js/ar/team-capture.js"
+  ></script>
+
 
 </body>
 </html>

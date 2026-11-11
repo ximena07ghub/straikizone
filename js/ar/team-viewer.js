@@ -18,104 +18,64 @@ const teams = (
 
 
 const container =
-  document.querySelector(
-    '#ar-container'
-  );
+  document.querySelector('#ar-container');
 
 const startPanel =
-  document.querySelector(
-    '[data-ar-start-panel]'
-  );
+  document.querySelector('[data-ar-start-panel]');
 
 const startBtn =
-  document.querySelector(
-    '[data-ar-start]'
-  );
+  document.querySelector('[data-ar-start]');
 
 const retryBtn =
-  document.querySelector(
-    '[data-ar-retry]'
-  );
+  document.querySelector('[data-ar-retry]');
 
 const statusEl =
-  document.querySelector(
-    '[data-ar-status]'
-  );
+  document.querySelector('[data-ar-status]');
 
 const helpEl =
-  document.querySelector(
-    '[data-ar-help]'
-  );
+  document.querySelector('[data-ar-help]');
 
 const controlsEl =
-  document.querySelector(
-    '[data-ar-controls]'
-  );
+  document.querySelector('[data-ar-controls]');
 
 const gestureTip =
-  document.querySelector(
-    '[data-gesture-tip]'
-  );
+  document.querySelector('[data-gesture-tip]');
 
 const jumpBtn =
-  document.querySelector(
-    '[data-jump]'
-  );
+  document.querySelector('[data-jump]');
 
 const confettiBtn =
-  document.querySelector(
-    '[data-confetti]'
-  );
+  document.querySelector('[data-confetti]');
 
 const spinBtn =
-  document.querySelector(
-    '[data-spin]'
-  );
+  document.querySelector('[data-spin]');
 
 const resetBtn =
-  document.querySelector(
-    '[data-reset]'
-  );
+  document.querySelector('[data-reset]');
 
 const infoBtn =
-  document.querySelector(
-    '[data-info]'
-  );
+  document.querySelector('[data-info]');
 
 const infoPanel =
-  document.querySelector(
-    '[data-info-panel]'
-  );
+  document.querySelector('[data-info-panel]');
 
 const infoClose =
-  document.querySelector(
-    '[data-info-close]'
-  );
+  document.querySelector('[data-info-close]');
 
 const infoTitle =
-  document.querySelector(
-    '[data-info-title]'
-  );
+  document.querySelector('[data-info-title]');
 
 const infoCity =
-  document.querySelector(
-    '[data-info-city]'
-  );
+  document.querySelector('[data-info-city]');
 
 const infoCopy =
-  document.querySelector(
-    '[data-info-copy]'
-  );
+  document.querySelector('[data-info-copy]');
 
 const teamName =
-  document.querySelector(
-    '[data-team-name]'
-  );
+  document.querySelector('[data-team-name]');
 
 const historyLink =
-  document.querySelector(
-    '[data-team-history-link]'
-  );
+  document.querySelector('[data-team-history-link]');
 
 
 let mindarThree = null;
@@ -167,14 +127,10 @@ function status(message) {
 
 function showError(message) {
   const box =
-    document.querySelector(
-      '[data-ar-error]'
-    );
+    document.querySelector('[data-ar-error]');
 
   const text =
-    document.querySelector(
-      '[data-ar-error-text]'
-    );
+    document.querySelector('[data-ar-error-text]');
 
   if (text) {
     text.textContent =
@@ -185,29 +141,19 @@ function showError(message) {
     box.hidden = false;
   }
 
-  status(
-    'AR no disponible'
-  );
+  status('AR no disponible');
 }
 
 
 function hideError() {
   const box =
-    document.querySelector(
-      '[data-ar-error]'
-    );
+    document.querySelector('[data-ar-error]');
 
   if (box) {
     box.hidden = true;
   }
 }
 
-
-/*
-  ==========================================================
-  COMPILACIÓN DE TARGETS
-  ==========================================================
-*/
 
 /*
   ==========================================================
@@ -223,14 +169,6 @@ function loadImageElement(team) {
 
       image.onload =
         () => {
-          /*
-            Un target demasiado pequeño puede producir
-            resultados pobres o errores durante la
-            compilación.
-
-            No detenemos el proceso por tamaño, pero
-            dejamos una advertencia útil en consola.
-          */
           if (
             image.naturalWidth < 128 ||
             image.naturalHeight < 128
@@ -257,11 +195,6 @@ function loadImageElement(team) {
           );
         };
 
-      /*
-        Los targets están dentro del mismo dominio
-        de StrikeZone, por lo que no necesitamos
-        crossOrigin.
-      */
       image.src =
         team.targetImage;
     }
@@ -290,12 +223,6 @@ async function prepareTargets() {
     'Cargando logos de equipos…'
   );
 
-  /*
-    Primero cargamos cada target de manera individual.
-
-    Así, si una ruta está mal, el error indica
-    exactamente qué equipo está causando el problema.
-  */
   const loadedTargets = [];
 
   for (
@@ -312,9 +239,7 @@ async function prepareTargets() {
 
     try {
       const target =
-        await loadImageElement(
-          team
-        );
+        await loadImageElement(team);
 
       loadedTargets.push(
         target
@@ -332,16 +257,12 @@ async function prepareTargets() {
   }
 
   /*
-    El orden es fundamental.
-
-    images[0] debe corresponder con teams[0],
-    images[1] con teams[1], etc., porque después
-    configureAnchors() utiliza ese mismo índice.
+    El orden debe coincidir con teams[] porque
+    configureAnchors() usa el mismo índice.
   */
   const images =
     loadedTargets.map(
-      target =>
-        target.image
+      target => target.image
     );
 
   if (
@@ -1409,12 +1330,8 @@ function attachGestures() {
 
 /*
   ==========================================================
-  CAPTURA WEBGL
+  CAPTURA WEBGL — NO MODIFICAR
   ==========================================================
-
-  Importante:
-  se realiza un render fresco y después readPixels(),
-  antes de que el navegador descarte el framebuffer.
 */
 
 function captureOverlay() {
