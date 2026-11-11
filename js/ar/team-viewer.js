@@ -11,9 +11,10 @@ import {
 
 const teams = (
   window.STRIKEZONE_TEAMS || []
-).filter(team =>
-  team.targetImage &&
-  team.model
+).filter(
+  team =>
+    team.targetImage &&
+    team.model
 );
 
 
@@ -127,8 +128,14 @@ let compiledBlobUrl = '';
 
 let started = false;
 
+/*
+  Solo será true cuando
+  await mindarThree.start()
+  termine correctamente.
+*/
+let mindarStarted = false;
+
 let currentTeam = null;
-let currentRoot = null;
 let currentEntry = null;
 
 const entries = [];
@@ -151,11 +158,9 @@ window.STRIKEZONE_TEAM_AR_STATE = {
 };
 
 
-/*
-  ==========================================================
-  UI
-  ==========================================================
-*/
+/* =========================================================
+   INTERFAZ
+   ========================================================= */
 
 function status(message) {
   if (statusEl) {
@@ -182,7 +187,8 @@ function showError(message) {
   }
 
   if (box) {
-    box.hidden = false;
+    box.hidden =
+      false;
   }
 
   status(
@@ -198,25 +204,31 @@ function hideError() {
     );
 
   if (box) {
-    box.hidden = true;
+    box.hidden =
+      true;
   }
 }
 
 
-/*
-  ==========================================================
-  COMPILACIÓN DE TARGETS
-  ==========================================================
-*/
+/* =========================================================
+   TARGETS
+   ========================================================= */
 
 function loadImageElement(src) {
   return new Promise(
-    (resolve, reject) => {
+    (
+      resolve,
+      reject
+    ) => {
       const image =
         new Image();
 
       image.onload =
-        () => resolve(image);
+        () => {
+          resolve(
+            image
+          );
+        };
 
       image.onerror =
         () => {
@@ -227,7 +239,8 @@ function loadImageElement(src) {
           );
         };
 
-      image.src = src;
+      image.src =
+        src;
     }
   );
 }
@@ -244,43 +257,54 @@ async function prepareTargets() {
     window.MINDAR?.Compiler ||
     window.MINDAR?.IMAGE?.Compiler;
 
+
   if (!Compiler) {
     throw new Error(
       'No se pudo cargar el compilador de MindAR.'
     );
   }
 
+
   status(
     'Preparando reconocimiento del logo…'
   );
 
+
   const images =
     await Promise.all(
-      teams.map(team =>
-        loadImageElement(
-          team.targetImage
-        )
+      teams.map(
+        team =>
+          loadImageElement(
+            team.targetImage
+          )
       )
     );
 
+
   const compiler =
     new Compiler();
+
 
   await compiler.compileImageTargets(
     images,
 
     progress => {
       const value =
-        Number(progress);
+        Number(
+          progress
+        );
 
       const percentage =
-        Number.isFinite(value)
+        Number.isFinite(
+          value
+        )
           ? Math.round(
               value <= 1
                 ? value * 100
                 : value
             )
           : 0;
+
 
       status(
         `Preparando reconocimiento… ${
@@ -296,14 +320,17 @@ async function prepareTargets() {
     }
   );
 
+
   const buffer =
     await compiler.exportData();
+
 
   if (compiledBlobUrl) {
     URL.revokeObjectURL(
       compiledBlobUrl
     );
   }
+
 
   compiledBlobUrl =
     URL.createObjectURL(
@@ -316,19 +343,19 @@ async function prepareTargets() {
       )
     );
 
+
   return compiledBlobUrl;
 }
 
 
-/*
-  ==========================================================
-  CONFETI
-  ==========================================================
-*/
+/* =========================================================
+   CONFETI
+   ========================================================= */
 
 function createConfetti() {
   const group =
     new THREE.Group();
+
 
   const palette = [
     0xe7d55a,
@@ -338,12 +365,14 @@ function createConfetti() {
     0x77a6d8
   ];
 
+
   const geometry =
     new THREE.BoxGeometry(
       0.028,
       0.012,
       0.006
     );
+
 
   for (
     let index = 0;
@@ -357,9 +386,14 @@ function createConfetti() {
             index %
             palette.length
           ],
-        roughness: 0.72,
-        metalness: 0.05
+
+        roughness:
+          0.72,
+
+        metalness:
+          0.05
       });
+
 
     const piece =
       new THREE.Mesh(
@@ -367,53 +401,68 @@ function createConfetti() {
         material
       );
 
+
     piece.userData.x =
-      (Math.random() - 0.5) *
+      (
+        Math.random() -
+        0.5
+      ) *
       0.9;
+
 
     piece.userData.z =
       0.12 +
       Math.random() *
       0.52;
 
+
     piece.userData.speed =
       0.22 +
       Math.random() *
       0.36;
 
+
     piece.userData.phase =
       Math.random() *
       1.2;
 
+
     piece.userData.spin =
-      (Math.random() - 0.5) *
+      (
+        Math.random() -
+        0.5
+      ) *
       5;
+
 
     group.add(
       piece
     );
   }
 
-  group.visible = false;
+
+  group.visible =
+    false;
+
 
   return group;
 }
 
 
-/*
-  ==========================================================
-  MODELOS
-  ==========================================================
-*/
+/* =========================================================
+   MODELOS
+   ========================================================= */
 
 async function loadTeamModel(entry) {
   if (entry.loaded) {
     return;
   }
 
+
   if (entry.loading) {
     return entry.loading;
   }
+
 
   entry.loading =
     (async () => {
@@ -421,16 +470,20 @@ async function loadTeamModel(entry) {
         `Cargando modelo de ${entry.team.name}…`
       );
 
+
       const loader =
         new GLTFLoader();
+
 
       const gltf =
         await loader.loadAsync(
           entry.team.model
         );
 
+
       const visual =
         gltf.scene;
+
 
       const box =
         new THREE.Box3()
@@ -438,15 +491,18 @@ async function loadTeamModel(entry) {
             visual
           );
 
+
       const center =
         box.getCenter(
           new THREE.Vector3()
         );
 
+
       const size =
         box.getSize(
           new THREE.Vector3()
         );
+
 
       const maxDimension =
         Math.max(
@@ -455,9 +511,11 @@ async function loadTeamModel(entry) {
           size.z
         ) || 1;
 
+
       visual.position.sub(
         center
       );
+
 
       const requestedScale =
         Number.isFinite(
@@ -466,9 +524,11 @@ async function loadTeamModel(entry) {
           ? entry.team.modelScale
           : 0.55;
 
+
       entry.baseScale =
         requestedScale /
         maxDimension;
+
 
       entry.modelPivot
         .scale
@@ -476,74 +536,88 @@ async function loadTeamModel(entry) {
           entry.baseScale
         );
 
+
       entry.modelPivot.add(
         visual
       );
 
+
       if (
-        gltf.animations &&
-        gltf.animations.length
+        gltf.animations?.length
       ) {
         entry.mixer =
           new THREE.AnimationMixer(
             visual
           );
 
+
         entry.embeddedAction =
           entry.mixer.clipAction(
             gltf.animations[0]
           );
+
 
         entry.embeddedAction.setLoop(
           THREE.LoopOnce,
           1
         );
 
+
         entry.embeddedAction.clampWhenFinished =
           true;
       }
 
-      entry.loaded = true;
+
+      entry.loaded =
+        true;
     })();
+
 
   try {
     await entry.loading;
+
   } finally {
-    entry.loading = null;
+    entry.loading =
+      null;
   }
 }
 
 
-/*
-  ==========================================================
-  INFORMACIÓN
-  ==========================================================
-*/
+/* =========================================================
+   INFO EQUIPO
+   ========================================================= */
 
 function updateTeamInfo(team) {
   if (!team) {
     return;
   }
 
+
   if (teamName) {
     teamName.textContent =
       team.name;
   }
+
 
   if (infoTitle) {
     infoTitle.textContent =
       team.name;
   }
 
+
   if (infoCity) {
     infoCity.textContent =
-      team.city || '';
+      team.city ||
+      '';
   }
+
 
   if (infoCopy) {
     infoCopy.textContent =
-      team.intro || '';
+      team.intro ||
+      '';
   }
+
 
   if (historyLink) {
     historyLink.href =
@@ -554,21 +628,21 @@ function updateTeamInfo(team) {
       }`;
   }
 
+
   document.title =
     `StrikeZone | ${team.name} AR`;
 }
 
 
-/*
-  ==========================================================
-  TRANSFORMACIONES
-  ==========================================================
-*/
+/* =========================================================
+   TRANSFORMACIÓN DEL MODELO
+   ========================================================= */
 
 function applyTransform(entry) {
   if (!entry) {
     return;
   }
+
 
   if (
     entry.root &&
@@ -581,15 +655,19 @@ function applyTransform(entry) {
     );
   }
 
+
   if (!entry.modelPivot) {
     return;
   }
 
+
   entry.modelPivot.rotation.x =
     entry.userRotX;
 
+
   entry.modelPivot.rotation.y =
     entry.userRotY;
+
 
   entry.modelPivot
     .scale
@@ -605,16 +683,31 @@ function resetEntry(entry) {
     return;
   }
 
-  entry.userScale = 1;
 
-  entry.userRotX = 0;
-  entry.userRotY = 0;
+  entry.userScale =
+    1;
 
-  entry.userPosX = 0;
-  entry.userPosY = 0;
 
-  entry.jumping = false;
-  entry.spinning = false;
+  entry.userRotX =
+    0;
+
+  entry.userRotY =
+    0;
+
+
+  entry.userPosX =
+    0;
+
+  entry.userPosY =
+    0;
+
+
+  entry.jumping =
+    false;
+
+  entry.spinning =
+    false;
+
 
   entry.root.position.set(
     0,
@@ -622,17 +715,22 @@ function resetEntry(entry) {
     entry.baseZ
   );
 
+
   entry.root.rotation.set(
     0,
     0,
     0
   );
 
-  entry.modelPivot.rotation.set(
-    0,
-    0,
-    0
-  );
+
+  entry.modelPivot
+    .rotation
+    .set(
+      0,
+      0,
+      0
+    );
+
 
   entry.modelPivot
     .scale
@@ -640,21 +738,24 @@ function resetEntry(entry) {
       entry.baseScale
     );
 
+
   if (entry.confettiOn) {
-    entry.confettiOn = false;
+    entry.confettiOn =
+      false;
 
     entry.confettiGroup.visible =
       false;
+  }
 
-    if (confettiBtn) {
-      confettiBtn.setAttribute(
-        'aria-pressed',
-        'false'
-      );
 
-      confettiBtn.innerHTML =
-        '<span>✦</span>Efectos OFF';
-    }
+  if (confettiBtn) {
+    confettiBtn.setAttribute(
+      'aria-pressed',
+      'false'
+    );
+
+    confettiBtn.innerHTML =
+      '<span>✦</span>Efectos OFF';
   }
 }
 
@@ -666,15 +767,14 @@ function resetCurrentModel() {
 }
 
 
-/*
-  ==========================================================
-  ANIMACIONES
-  ==========================================================
-*/
+/* =========================================================
+   ANIMACIÓN
+   ========================================================= */
 
 function startJump() {
   const entry =
     currentEntry;
+
 
   if (
     !entry ||
@@ -686,13 +786,18 @@ function startJump() {
     return;
   }
 
-  entry.jumping = true;
+
+  entry.jumping =
+    true;
+
 
   entry.jumpStart =
     performance.now();
 
+
   if (entry.embeddedAction) {
     entry.embeddedAction.reset();
+
     entry.embeddedAction.play();
   }
 }
@@ -701,6 +806,7 @@ function startJump() {
 function startSpin() {
   const entry =
     currentEntry;
+
 
   if (
     !entry ||
@@ -711,7 +817,10 @@ function startSpin() {
     return;
   }
 
-  entry.spinning = true;
+
+  entry.spinning =
+    true;
+
 
   entry.spinStart =
     performance.now();
@@ -722,15 +831,19 @@ function toggleConfetti() {
   const entry =
     currentEntry;
 
+
   if (!entry) {
     return;
   }
 
+
   entry.confettiOn =
     !entry.confettiOn;
 
+
   entry.confettiGroup.visible =
     entry.confettiOn;
+
 
   if (confettiBtn) {
     confettiBtn.setAttribute(
@@ -739,6 +852,7 @@ function toggleConfetti() {
         entry.confettiOn
       )
     );
+
 
     confettiBtn.innerHTML =
       `<span>✦</span>Efectos ${
@@ -759,9 +873,11 @@ function updateEntryAnimations(
     return;
   }
 
+
   entry.mixer?.update(
     delta
   );
+
 
   if (
     entry.jumping &&
@@ -773,8 +889,10 @@ function updateEntryAnimations(
         (
           now -
           entry.jumpStart
-        ) / 760
+        ) /
+        760
       );
+
 
     const arc =
       Math.sin(
@@ -782,26 +900,31 @@ function updateEntryAnimations(
         progress
       );
 
-    const jumpHeight =
-      0.34;
 
     entry.root.position.set(
       entry.userPosX,
+
       entry.userPosY +
         arc *
-        jumpHeight,
+        0.34,
+
       entry.baseZ
     );
 
-    if (progress >= 1) {
+
+    if (
+      progress >= 1
+    ) {
       entry.jumping =
         false;
+
 
       applyTransform(
         entry
       );
     }
   }
+
 
   if (
     entry.spinning &&
@@ -813,15 +936,19 @@ function updateEntryAnimations(
         (
           now -
           entry.spinStart
-        ) / 1500
+        ) /
+        1500
       );
+
 
     const eased =
       1 -
       Math.pow(
-        1 - progress,
+        1 -
+        progress,
         3
       );
+
 
     entry.modelPivot.rotation.y =
       entry.userRotY +
@@ -829,9 +956,13 @@ function updateEntryAnimations(
       2 *
       eased;
 
-    if (progress >= 1) {
+
+    if (
+      progress >= 1
+    ) {
       entry.spinning =
         false;
+
 
       applyTransform(
         entry
@@ -839,29 +970,42 @@ function updateEntryAnimations(
     }
   }
 
+
   if (
-    entry.confettiGroup?.visible
+    entry.confettiGroup
+      ?.visible
   ) {
     const time =
-      now / 1000;
+      now /
+      1000;
+
 
     entry.confettiGroup
       .children
       .forEach(
-        (piece, index) => {
+        (
+          piece,
+          index
+        ) => {
           const data =
             piece.userData;
+
 
           const cycle =
             (
               data.phase +
               time *
               data.speed
-            ) % 1.25;
+            ) %
+            1.25;
+
 
           piece.position.set(
             data.x,
-            0.62 - cycle,
+
+            0.62 -
+              cycle,
+
             data.z +
               Math.sin(
                 time *
@@ -871,6 +1015,7 @@ function updateEntryAnimations(
               0.035
           );
 
+
           piece.rotation.x =
             time *
             (
@@ -879,9 +1024,11 @@ function updateEntryAnimations(
               2
             );
 
+
           piece.rotation.y =
             time *
             data.spin;
+
 
           piece.rotation.z =
             time *
@@ -895,21 +1042,23 @@ function updateEntryAnimations(
 }
 
 
-/*
-  ==========================================================
-  GESTOS
-  ==========================================================
-*/
+/* =========================================================
+   GESTOS
+   ========================================================= */
 
 function attachGestures() {
   const centerOfPointers =
     () => {
       const values =
-        [...pointers.values()];
+        [
+          ...pointers.values()
+        ];
+
 
       if (!values.length) {
         return null;
       }
+
 
       return {
         x:
@@ -941,6 +1090,7 @@ function attachGestures() {
 
   container.addEventListener(
     'pointerdown',
+
     event => {
       if (
         event.target.closest(
@@ -950,9 +1100,16 @@ function attachGestures() {
         return;
       }
 
-      if (!currentEntry) {
+
+      if (
+        !currentEntry ||
+        !window
+          .STRIKEZONE_TEAM_AR_STATE
+          .targetVisible
+      ) {
         return;
       }
+
 
       container
         .setPointerCapture
@@ -960,21 +1117,30 @@ function attachGestures() {
           event.pointerId
         );
 
+
       pointers.set(
         event.pointerId,
         {
-          x: event.clientX,
-          y: event.clientY
+          x:
+            event.clientX,
+
+          y:
+            event.clientY
         }
       );
+
 
       if (
         pointers.size === 1
       ) {
         lastSingle = {
-          x: event.clientX,
-          y: event.clientY
+          x:
+            event.clientX,
+
+          y:
+            event.clientY
         };
+
 
         tapCandidate = {
           id:
@@ -994,13 +1160,19 @@ function attachGestures() {
         };
       }
 
+
       if (
         pointers.size === 2
       ) {
-        tapCandidate = null;
+        tapCandidate =
+          null;
+
 
         const points =
-          [...pointers.values()];
+          [
+            ...pointers.values()
+          ];
+
 
         lastPinchDistance =
           Math.hypot(
@@ -1011,6 +1183,7 @@ function attachGestures() {
               points[1].y
           );
 
+
         lastPinchCenter =
           centerOfPointers();
       }
@@ -1020,9 +1193,11 @@ function attachGestures() {
 
   container.addEventListener(
     'pointermove',
+
     event => {
       const entry =
         currentEntry;
+
 
       if (
         !entry ||
@@ -1036,6 +1211,7 @@ function attachGestures() {
         return;
       }
 
+
       pointers.set(
         event.pointerId,
         {
@@ -1046,6 +1222,7 @@ function attachGestures() {
             event.clientY
         }
       );
+
 
       if (
         tapCandidate &&
@@ -1072,23 +1249,30 @@ function attachGestures() {
           event.clientX -
           lastSingle.x;
 
+
         const dy =
           event.clientY -
           lastSingle.y;
 
+
         entry.userRotY +=
-          dx * 0.009;
+          dx *
+          0.009;
+
 
         entry.userRotX =
           Math.max(
             -1.05,
+
             Math.min(
               1.05,
+
               entry.userRotX +
                 dy *
                 0.007
             )
           );
+
 
         lastSingle = {
           x:
@@ -1098,15 +1282,24 @@ function attachGestures() {
             event.clientY
         };
 
+
         applyTransform(
           entry
         );
 
-      } else if (
+
+        return;
+      }
+
+
+      if (
         pointers.size === 2
       ) {
         const points =
-          [...pointers.values()];
+          [
+            ...pointers.values()
+          ];
+
 
         const distance =
           Math.hypot(
@@ -1117,8 +1310,10 @@ function attachGestures() {
               points[1].y
           );
 
+
         const center =
           centerOfPointers();
+
 
         if (
           lastPinchDistance >
@@ -1127,8 +1322,10 @@ function attachGestures() {
           entry.userScale =
             Math.max(
               0.38,
+
               Math.min(
                 2.5,
+
                 entry.userScale *
                   (
                     distance /
@@ -1138,6 +1335,7 @@ function attachGestures() {
             );
         }
 
+
         if (
           lastPinchCenter &&
           center
@@ -1145,8 +1343,10 @@ function attachGestures() {
           entry.userPosX =
             Math.max(
               -0.65,
+
               Math.min(
                 0.65,
+
                 entry.userPosX +
                   (
                     center.x -
@@ -1156,11 +1356,14 @@ function attachGestures() {
               )
             );
 
+
           entry.userPosY =
             Math.max(
               -0.70,
+
               Math.min(
                 0.70,
+
                 entry.userPosY -
                   (
                     center.y -
@@ -1171,11 +1374,14 @@ function attachGestures() {
             );
         }
 
+
         lastPinchDistance =
           distance;
 
+
         lastPinchCenter =
           center;
+
 
         applyTransform(
           entry
@@ -1200,27 +1406,40 @@ function attachGestures() {
           .STRIKEZONE_TEAM_AR_STATE
           .targetVisible;
 
+
       pointers.delete(
         event.pointerId
       );
 
+
       lastSingle =
         pointers.size === 1
-          ? [...pointers.values()][0]
+          ? [
+              ...pointers.values()
+            ][0]
+
           : null;
+
 
       if (
         pointers.size < 2
       ) {
-        lastPinchDistance = 0;
-        lastPinchCenter = null;
+        lastPinchDistance =
+          0;
+
+
+        lastPinchCenter =
+          null;
       }
+
 
       if (canTap) {
         startJump();
       }
 
-      tapCandidate = null;
+
+      tapCandidate =
+        null;
     };
 
 
@@ -1228,6 +1447,7 @@ function attachGestures() {
     'pointerup',
     endPointer
   );
+
 
   container.addEventListener(
     'pointercancel',
@@ -1237,9 +1457,11 @@ function attachGestures() {
 
   container.addEventListener(
     'wheel',
+
     event => {
       const entry =
         currentEntry;
+
 
       if (
         !entry ||
@@ -1250,13 +1472,17 @@ function attachGestures() {
         return;
       }
 
+
       event.preventDefault();
+
 
       entry.userScale =
         Math.max(
           0.38,
+
           Math.min(
             2.5,
+
             entry.userScale *
               (
                 event.deltaY > 0
@@ -1266,26 +1492,23 @@ function attachGestures() {
           )
         );
 
+
       applyTransform(
         entry
       );
     },
+
     {
-      passive: false
+      passive:
+        false
     }
   );
 }
 
 
-/*
-  ==========================================================
-  CAPTURA WEBGL
-  ==========================================================
-
-  Importante:
-  se realiza un render fresco y después readPixels(),
-  antes de que el navegador descarte el framebuffer.
-*/
+/* =========================================================
+   CAPTURA DEL CANVAS WEBGL
+   ========================================================= */
 
 function captureOverlay() {
   if (
@@ -1296,19 +1519,28 @@ function captureOverlay() {
     return null;
   }
 
+
+  /*
+    Render fresco justo antes de leer
+    los píxeles del framebuffer.
+  */
   renderer.render(
     scene,
     camera
   );
 
+
   const source =
     renderer.domElement;
+
 
   const width =
     source.width;
 
+
   const height =
     source.height;
+
 
   if (
     !width ||
@@ -1317,8 +1549,10 @@ function captureOverlay() {
     return null;
   }
 
+
   const gl =
     renderer.getContext();
+
 
   const pixels =
     new Uint8Array(
@@ -1326,6 +1560,7 @@ function captureOverlay() {
       height *
       4
     );
+
 
   gl.readPixels(
     0,
@@ -1337,25 +1572,31 @@ function captureOverlay() {
     pixels
   );
 
+
   const snapshot =
     document.createElement(
       'canvas'
     );
 
+
   snapshot.width =
     width;
 
+
   snapshot.height =
     height;
+
 
   const context =
     snapshot.getContext(
       '2d'
     );
 
+
   if (!context) {
     return null;
   }
+
 
   const imageData =
     context.createImageData(
@@ -1363,12 +1604,15 @@ function captureOverlay() {
       height
     );
 
+
   const rowBytes =
-    width * 4;
+    width *
+    4;
+
 
   /*
-    WebGL entrega los píxeles de abajo hacia arriba.
-    Aquí invertimos verticalmente cada fila.
+    readPixels entrega las filas
+    invertidas verticalmente.
   */
   for (
     let y = 0;
@@ -1383,9 +1627,11 @@ function captureOverlay() {
       ) *
       rowBytes;
 
+
     const destinationStart =
       y *
       rowBytes;
+
 
     imageData.data.set(
       pixels.subarray(
@@ -1393,9 +1639,11 @@ function captureOverlay() {
         sourceStart +
           rowBytes
       ),
+
       destinationStart
     );
   }
+
 
   context.putImageData(
     imageData,
@@ -1403,8 +1651,11 @@ function captureOverlay() {
     0
   );
 
+
   const rect =
-    source.getBoundingClientRect();
+    source
+      .getBoundingClientRect();
+
 
   return {
     canvas:
@@ -1432,35 +1683,35 @@ window.STRIKEZONE_AR_CAPTURE = {
 };
 
 
-/*
-  ==========================================================
-  TARGET ENCONTRADO / PERDIDO
-  ==========================================================
-*/
+/* =========================================================
+   TARGET ENCONTRADO
+   ========================================================= */
 
 async function teamFound(entry) {
   currentTeam =
     entry.team;
 
-  currentRoot =
-    entry.root;
 
   currentEntry =
     entry;
+
 
   window
     .STRIKEZONE_TEAM_AR_STATE
     .team =
       entry.team;
 
+
   window
     .STRIKEZONE_TEAM_AR_STATE
     .targetVisible =
       true;
 
+
   updateTeamInfo(
     entry.team
   );
+
 
   entries.forEach(
     item => {
@@ -1473,13 +1724,16 @@ async function teamFound(entry) {
     }
   );
 
+
   try {
     await loadTeamModel(
       entry
     );
 
+
     if (
-      currentEntry !== entry ||
+      currentEntry !==
+        entry ||
       !window
         .STRIKEZONE_TEAM_AR_STATE
         .targetVisible
@@ -1487,41 +1741,50 @@ async function teamFound(entry) {
       return;
     }
 
+
     entry.root.visible =
       true;
+
 
     if (helpEl) {
       helpEl.hidden =
         true;
     }
 
+
     if (controlsEl) {
       controlsEl.hidden =
         false;
     }
 
+
     if (gestureTip) {
       gestureTip.hidden =
         false;
 
-      setTimeout(
+
+      window.setTimeout(
         () => {
           if (gestureTip) {
             gestureTip.hidden =
               true;
           }
         },
+
         4200
       );
     }
 
+
     if (confettiBtn) {
       confettiBtn.setAttribute(
         'aria-pressed',
+
         String(
           entry.confettiOn
         )
       );
+
 
       confettiBtn.innerHTML =
         `<span>✦</span>Efectos ${
@@ -1530,6 +1793,7 @@ async function teamFound(entry) {
             : 'OFF'
         }`;
     }
+
 
     status(
       `${entry.team.name} reconocido ✓`
@@ -1541,8 +1805,10 @@ async function teamFound(entry) {
       error
     );
 
+
     entry.root.visible =
       false;
+
 
     status(
       `No se pudo cargar el modelo de ${entry.team.name}.`
@@ -1551,66 +1817,85 @@ async function teamFound(entry) {
 }
 
 
+/* =========================================================
+   TARGET PERDIDO
+   ========================================================= */
+
 function teamLost(entry) {
   entry.root.visible =
     false;
 
+
   if (
-    currentEntry === entry
+    currentEntry !== entry
   ) {
-    window
-      .STRIKEZONE_TEAM_AR_STATE
-      .targetVisible =
-        false;
-
-    currentRoot = null;
-
-    if (controlsEl) {
-      controlsEl.hidden =
-        true;
-    }
-
-    if (gestureTip) {
-      gestureTip.hidden =
-        true;
-    }
-
-    if (infoPanel) {
-      infoPanel.hidden =
-        true;
-    }
-
-    if (helpEl) {
-      helpEl.hidden =
-        false;
-    }
-
-    status(
-      'Apunta nuevamente al logo del equipo'
-    );
+    return;
   }
+
+
+  window
+    .STRIKEZONE_TEAM_AR_STATE
+    .targetVisible =
+      false;
+
+
+  if (controlsEl) {
+    controlsEl.hidden =
+      true;
+  }
+
+
+  if (gestureTip) {
+    gestureTip.hidden =
+      true;
+  }
+
+
+  if (infoPanel) {
+    infoPanel.hidden =
+      true;
+  }
+
+
+  if (helpEl) {
+    helpEl.hidden =
+      false;
+  }
+
+
+  status(
+    'Apunta nuevamente al logo del equipo'
+  );
 }
 
 
-/*
-  ==========================================================
-  ANCHORS
-  ==========================================================
-*/
+/* =========================================================
+   ANCHORS
+   ========================================================= */
 
 function configureAnchors() {
+  entries.length =
+    0;
+
+
   teams.forEach(
-    (team, index) => {
+    (
+      team,
+      index
+    ) => {
       const anchor =
         mindarThree.addAnchor(
           index
         );
 
+
       const root =
         new THREE.Group();
 
+
       root.visible =
         false;
+
 
       const baseZ =
         Number.isFinite(
@@ -1619,26 +1904,33 @@ function configureAnchors() {
           ? team.baseZ
           : 0.18;
 
+
       root.position.z =
         baseZ;
+
 
       const modelPivot =
         new THREE.Group();
 
+
       const confettiGroup =
         createConfetti();
+
 
       root.add(
         modelPivot
       );
 
+
       root.add(
         confettiGroup
       );
 
+
       anchor.group.add(
         root
       );
+
 
       const entry = {
         team,
@@ -1647,35 +1939,59 @@ function configureAnchors() {
         modelPivot,
         confettiGroup,
 
-        loaded: false,
-        loading: null,
+        loaded:
+          false,
 
-        mixer: null,
-        embeddedAction: null,
+        loading:
+          null,
 
-        baseScale: 1,
+        mixer:
+          null,
+
+        embeddedAction:
+          null,
+
+        baseScale:
+          1,
+
         baseZ,
 
-        userScale: 1,
+        userScale:
+          1,
 
-        userRotX: 0,
-        userRotY: 0,
+        userRotX:
+          0,
 
-        userPosX: 0,
-        userPosY: 0,
+        userRotY:
+          0,
 
-        jumping: false,
-        jumpStart: 0,
+        userPosX:
+          0,
 
-        spinning: false,
-        spinStart: 0,
+        userPosY:
+          0,
 
-        confettiOn: false
+        jumping:
+          false,
+
+        jumpStart:
+          0,
+
+        spinning:
+          false,
+
+        spinStart:
+          0,
+
+        confettiOn:
+          false
       };
+
 
       entries.push(
         entry
       );
+
 
       anchor.onTargetFound =
         () => {
@@ -1683,6 +1999,7 @@ function configureAnchors() {
             entry
           );
         };
+
 
       anchor.onTargetLost =
         () => {
@@ -1695,32 +2012,125 @@ function configureAnchors() {
 }
 
 
-/*
-  ==========================================================
-  INICIO AR
-  ==========================================================
-*/
+/* =========================================================
+   LIMPIEZA DE INICIALIZACIÓN FALLIDA
+   ========================================================= */
+
+function clearPartialAR() {
+  renderer
+    ?.setAnimationLoop(
+      null
+    );
+
+
+  /*
+    Importante:
+    solo removemos nodos creados por MindAR.
+    No llamamos stop() aquí.
+  */
+  container
+    ?.querySelectorAll(
+      ':scope > video, :scope > canvas'
+    )
+    .forEach(
+      element =>
+        element.remove()
+    );
+
+
+  renderer =
+    null;
+
+  scene =
+    null;
+
+  camera =
+    null;
+
+  mindarThree =
+    null;
+
+
+  mindarStarted =
+    false;
+
+  started =
+    false;
+
+
+  currentTeam =
+    null;
+
+  currentEntry =
+    null;
+
+
+  entries.length =
+    0;
+
+
+  pointers.clear();
+
+
+  lastSingle =
+    null;
+
+  lastPinchDistance =
+    0;
+
+  lastPinchCenter =
+    null;
+
+  tapCandidate =
+    null;
+
+
+  window
+    .STRIKEZONE_TEAM_AR_STATE
+    .team =
+      null;
+
+
+  window
+    .STRIKEZONE_TEAM_AR_STATE
+    .targetVisible =
+      false;
+}
+
+
+/* =========================================================
+   INICIO AR
+   ========================================================= */
 
 async function startAR() {
   if (started) {
     return;
   }
 
+
   hideError();
+
 
   if (startBtn) {
     startBtn.disabled =
       true;
   }
 
+
   try {
     const targetSource =
       await prepareTargets();
+
 
     status(
       'Inicializando cámara…'
     );
 
+
+    /*
+      Esta parte mantiene el orden del
+      commit que ya funcionaba.
+    */
     mindarThree =
       new MindARThree({
         container,
@@ -1728,12 +2138,19 @@ async function startAR() {
         imageTargetSrc:
           targetSource,
 
-        maxTrack: 1,
+        maxTrack:
+          1,
 
-        uiLoading: 'no',
-        uiScanning: 'no',
-        uiError: 'no'
+        uiLoading:
+          'no',
+
+        uiScanning:
+          'no',
+
+        uiError:
+          'no'
       });
+
 
     ({
       renderer,
@@ -1741,13 +2158,16 @@ async function startAR() {
       camera
     } = mindarThree);
 
+
     renderer.setPixelRatio(
       Math.min(
         window.devicePixelRatio ||
           1,
+
         2
       )
     );
+
 
     scene.add(
       new THREE.HemisphereLight(
@@ -1757,54 +2177,81 @@ async function startAR() {
       )
     );
 
+
+    /*
+      Valores originales de iluminación
+      del commit funcional.
+    */
     const directional =
       new THREE.DirectionalLight(
         0xffffff,
-        2.4
+        2.3
       );
 
+
     directional.position.set(
-      1.4,
+      1.5,
       2,
-      2.3
+      2.5
     );
+
 
     scene.add(
       directional
     );
 
+
     configureAnchors();
 
+
+    /*
+      Punto crítico:
+      no marcamos la cámara como iniciada
+      hasta que esta promesa termine.
+    */
     await mindarThree.start();
 
-    started = true;
+
+    mindarStarted =
+      true;
+
+
+    started =
+      true;
+
 
     if (startPanel) {
       startPanel.hidden =
         true;
     }
 
+
     if (helpEl) {
       helpEl.hidden =
         false;
     }
 
+
     status(
       'Apunta al logo del equipo'
     );
 
+
     clock.start();
+
 
     renderer.setAnimationLoop(
       () => {
         const now =
           performance.now();
 
+
         const delta =
           Math.min(
             clock.getDelta(),
             0.05
           );
+
 
         if (
           currentEntry &&
@@ -1819,6 +2266,7 @@ async function startAR() {
           );
         }
 
+
         renderer.render(
           scene,
           camera
@@ -1832,37 +2280,39 @@ async function startAR() {
       error
     );
 
-    try {
-      await mindarThree
-        ?.stop
-        ?.();
-    } catch (stopError) {
-      console.warn(
-        'No se pudo detener MindAR:',
-        stopError
-      );
+
+    /*
+      NO llamar stop() si start()
+      nunca terminó.
+
+      Esto elimina:
+      Cannot read properties of undefined
+      (reading 'stopProcessVideo')
+    */
+    if (
+      mindarStarted &&
+      mindarThree
+    ) {
+      try {
+        await mindarThree.stop();
+
+      } catch (stopError) {
+        console.warn(
+          'No se pudo detener MindAR:',
+          stopError
+        );
+      }
     }
 
-    container
-      ?.querySelectorAll(
-        ':scope > video, :scope > canvas'
-      )
-      .forEach(
-        element =>
-          element.remove()
-      );
 
-    mindarThree = null;
-    renderer = null;
-    scene = null;
-    camera = null;
+    clearPartialAR();
 
-    started = false;
 
     if (startBtn) {
       startBtn.disabled =
         false;
     }
+
 
     showError(
       error?.message ||
@@ -1872,35 +2322,13 @@ async function startAR() {
 }
 
 
-/*
-  ==========================================================
-  EVENTOS
-  ==========================================================
-*/
-
-jumpBtn?.addEventListener(
-  'click',
-  startJump
-);
-
-spinBtn?.addEventListener(
-  'click',
-  startSpin
-);
-
-confettiBtn?.addEventListener(
-  'click',
-  toggleConfetti
-);
-
-resetBtn?.addEventListener(
-  'click',
-  resetCurrentModel
-);
-
+/* =========================================================
+   EVENTOS
+   ========================================================= */
 
 infoBtn?.addEventListener(
   'click',
+
   () => {
     if (
       !currentTeam ||
@@ -1908,6 +2336,7 @@ infoBtn?.addEventListener(
     ) {
       return;
     }
+
 
     infoPanel.hidden =
       !infoPanel.hidden;
@@ -1917,6 +2346,7 @@ infoBtn?.addEventListener(
 
 infoClose?.addEventListener(
   'click',
+
   () => {
     if (infoPanel) {
       infoPanel.hidden =
@@ -1926,8 +2356,33 @@ infoClose?.addEventListener(
 );
 
 
+jumpBtn?.addEventListener(
+  'click',
+  startJump
+);
+
+
+spinBtn?.addEventListener(
+  'click',
+  startSpin
+);
+
+
+confettiBtn?.addEventListener(
+  'click',
+  toggleConfetti
+);
+
+
+resetBtn?.addEventListener(
+  'click',
+  resetCurrentModel
+);
+
+
 startBtn?.addEventListener(
   'click',
+
   () => {
     void startAR();
   }
@@ -1936,6 +2391,7 @@ startBtn?.addEventListener(
 
 retryBtn?.addEventListener(
   'click',
+
   () => {
     hideError();
 
@@ -1947,22 +2403,42 @@ retryBtn?.addEventListener(
 attachGestures();
 
 
+/* =========================================================
+   SALIDA DE LA PÁGINA
+   ========================================================= */
+
 window.addEventListener(
   'pagehide',
+
   () => {
     renderer
       ?.setAnimationLoop(
         null
       );
 
-    mindarThree
-      ?.stop
-      ?.();
+
+    /*
+      Aquí sí puede detenerse,
+      pero únicamente si start()
+      había terminado correctamente.
+    */
+    if (
+      mindarStarted &&
+      mindarThree
+    ) {
+      mindarThree
+        .stop()
+        .catch(
+          () => {}
+        );
+    }
+
 
     if (compiledBlobUrl) {
       URL.revokeObjectURL(
         compiledBlobUrl
       );
+
 
       compiledBlobUrl =
         '';
