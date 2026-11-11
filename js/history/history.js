@@ -95,76 +95,95 @@
     ]
   };
 
-  // Historia de los clubes de la Zona Norte.
+
+
   const teams = [
     {
-      
-        id: 'sultanes',
-        code: 'MTY',
-        name: 'Sultanes de Monterrey',
-        city: 'Monterrey, Nuevo León',
-      
-        // Configuración AR del equipo
-        targetImage: 'assets/ar/teams/target/sultanes.jpg',
-      
-        model: 'assets/ar/teams/models/bate.glb',
-      
-        modelLabel: 'Modelo 3D de Sultanes',
-        modelScale: 0.55,
-      
-        intro: 'Organización regiomontana con raíces en 1939 y una extensa trayectoria de campeonatos en la LMB.',
-      
-        events: [
-          event(
-            '1939',
-            'Primeros años',
-            'El club debutó como Carta Blanca y comenzó la tradición profesional de Monterrey.'
-          ),
-          event(
-            '1943',
-            'Primer campeonato',
-            'Bajo el nombre Industriales, el equipo obtuvo un título dirigido por Lázaro Salazar.'
-          ),
-          event(
-            '1949',
-            'Una etapa histórica',
-            'El club, ya identificado como Sultanes, completó la extraordinaria secuencia de títulos de finales de los cuarenta.'
-          ),
-          event(
-            '1962',
-            'Otro campeonato',
-            'Los Sultanes conquistaron un nuevo título bajo la dirección de Clemente Carrera.'
-          ),
-          event(
-            '2007',
-            'Una nueva corona',
-            'La organización volvió a conquistar el campeonato de la Liga Mexicana.'
-          ),
-          event(
-            '2018',
-            'Décimo campeonato',
-            'Sultanes consiguió su décima corona en la segunda temporada de 2018.'
-          )
-        ],
-      
-        sources: [
-          source(
-            'Sultanes · Historia de 1939',
-            'https://www.milb.com/news/sultanes-de-monterrey-celebra-81-anos-de-grandeza'
-          ),
-          source(
-            'LMB · Campeonatos de Sultanes',
-            'https://www.milb.com/news/previa-equipo-renovado-en-la-sultana-del-norte'
-          ),
-          lmbChampions
-        ]
-      },
+      id: 'sultanes',
+      code: 'MTY',
+      name: 'Sultanes de Monterrey',
+      city: 'Monterrey, Nuevo León',
+
+      // AR · LOGO/TARGET
+      targetImage:
+        'assets/ar/teams/target/sultanes.jpg',
+
+      // AR · MODELO
+      model:
+        'assets/ar/teams/models/bate.glb',
+
+      modelLabel:
+        'Modelo 3D de Sultanes de Monterrey',
+
+      modelScale: 0.55,
+
+      intro:
+        'Organización regiomontana con raíces en 1939 y una extensa trayectoria de campeonatos en la LMB.',
+
+      events: [
+        event(
+          '1939',
+          'Primeros años',
+          'El club debutó como Carta Blanca y comenzó la tradición profesional de Monterrey.'
+        ),
+        event(
+          '1943',
+          'Primer campeonato',
+          'Bajo el nombre Industriales, el equipo obtuvo un título dirigido por Lázaro Salazar.'
+        ),
+        event(
+          '1949',
+          'Una etapa histórica',
+          'El club, ya identificado como Sultanes, completó la extraordinaria secuencia de títulos de finales de los cuarenta.'
+        ),
+        event(
+          '1962',
+          'Otro campeonato',
+          'Los Sultanes conquistaron un nuevo título bajo la dirección de Clemente Carrera.'
+        ),
+        event(
+          '2007',
+          'Una nueva corona',
+          'La organización volvió a conquistar el campeonato de la Liga Mexicana.'
+        ),
+        event(
+          '2018',
+          'Décimo campeonato',
+          'Sultanes consiguió su décima corona en la segunda temporada de 2018.'
+        )
+      ],
+
+      sources: [
+        source(
+          'Sultanes · Historia de 1939',
+          'https://www.milb.com/news/sultanes-de-monterrey-celebra-81-anos-de-grandeza'
+        ),
+        source(
+          'LMB · Campeonatos de Sultanes',
+          'https://www.milb.com/news/previa-equipo-renovado-en-la-sultana-del-norte'
+        ),
+        lmbChampions
+      ]
+    },
 
     {
       id: 'toros',
       code: 'TIJ',
       name: 'Toros de Tijuana',
       city: 'Tijuana, Baja California',
+
+      // CAMBIAR: logo que también reconocerá MindAR.
+      targetImage:
+        'assets/ar/teams/target/toros.png',
+
+      // CAMBIAR: GLB que quieras asignar a Toros.
+      model:
+        'assets/ar/teams/models/camisa.glb',
+
+      modelLabel:
+        'Modelo 3D de Toros de Tijuana',
+
+      modelScale: 0.55,
 
       intro:
         'Club fronterizo con una primera etapa en 2004 y una etapa continua a partir de 2014.',
@@ -209,6 +228,19 @@
       code: 'JAL',
       name: 'Charros de Jalisco',
       city: 'Guadalajara, Jalisco',
+
+      // CAMBIAR
+      targetImage:
+        'assets/ar/teams/target/charros.png',
+
+      // CAMBIAR
+      model:
+        'assets/ar/teams/models/pelota.glb',
+
+      modelLabel:
+        'Modelo 3D de Charros de Jalisco',
+
+      modelScale: 0.55,
 
       intro:
         'Nombre histórico del béisbol jalisciense, con distintas etapas en la LMB y regreso al circuito de verano en 2024.',
@@ -256,6 +288,19 @@
       name: 'Acereros de Monclova',
       city: 'Monclova, Coahuila',
 
+      // CAMBIAR
+      targetImage:
+        'assets/ar/teams/target/acereros.png',
+
+      // CAMBIAR
+      model:
+        'assets/ar/teams/models/tachones.glb',
+
+      modelLabel:
+        'Modelo 3D de Acereros de Monclova',
+
+      modelScale: 0.55,
+
       intro:
         'Tradición profesional de Monclova que nació en la LMB bajo otras denominaciones antes de adoptar el nombre Acereros.',
 
@@ -300,6 +345,19 @@
       name: 'Algodoneros de Unión Laguna',
       city: 'Torreón, Coahuila',
 
+      // CAMBIAR
+      targetImage:
+        'assets/ar/teams/target/algodoneros.png',
+
+      // CAMBIAR
+      model:
+        'assets/ar/teams/models/trofeo.glb',
+
+      modelLabel:
+        'Modelo 3D de Algodoneros de Unión Laguna',
+
+      modelScale: 0.55,
+
       intro:
         'Una de las identidades tradicionales del béisbol de la Comarca Lagunera.',
 
@@ -340,6 +398,19 @@
       code: 'SAL',
       name: 'Saraperos de Saltillo',
       city: 'Saltillo, Coahuila',
+
+      // CAMBIAR
+      targetImage:
+        'assets/ar/teams/target/saraperos.png',
+
+      // CAMBIAR
+      model:
+        'assets/ar/teams/models/zona_home.glb',
+
+      modelLabel:
+        'Modelo 3D de Saraperos de Saltillo',
+
+      modelScale: 0.55,
 
       intro:
         'Club de gran tradición en la LMB desde 1970, identificado con la ciudad de Saltillo.',
@@ -390,6 +461,19 @@
       name: 'Rieleros de Aguascalientes',
       city: 'Aguascalientes, Aguascalientes',
 
+      // CAMBIAR
+      targetImage:
+        'assets/ar/teams/target/rieleros.png',
+
+      // CAMBIAR
+      model:
+        'assets/ar/teams/models/pelota-yadier.glb',
+
+      modelLabel:
+        'Modelo 3D de Rieleros de Aguascalientes',
+
+      modelScale: 0.55,
+
       intro:
         'Organización ligada al crecimiento del béisbol de la LMB en Aguascalientes.',
 
@@ -430,6 +514,19 @@
       code: 'DOS',
       name: 'Tecolotes de los Dos Laredos',
       city: 'Nuevo Laredo / Laredo',
+
+      // CAMBIAR
+      targetImage:
+        'assets/ar/teams/target/tecolotes.png',
+
+      // CAMBIAR
+      model:
+        'assets/ar/teams/models/estadio.glb',
+
+      modelLabel:
+        'Modelo 3D de Tecolotes de los Dos Laredos',
+
+      modelScale: 0.55,
 
       intro:
         'Organización fronteriza reconocida por su tradición beisbolera a ambos lados de la frontera.',
@@ -486,6 +583,19 @@
       name: 'Caliente de Durango',
       city: 'Durango, Durango',
 
+      // CAMBIAR
+      targetImage:
+        'assets/ar/teams/target/caliente.png',
+
+      // CAMBIAR
+      model:
+        'assets/ar/teams/models/GORRA.glb',
+
+      modelLabel:
+        'Modelo 3D de Caliente de Durango',
+
+      modelScale: 0.55,
+
       intro:
         'Identidad presentada en 2024 para una nueva etapa del béisbol profesional en Durango.',
 
@@ -534,6 +644,19 @@
       name: 'Dorados de Chihuahua',
       city: 'Chihuahua, Chihuahua',
 
+      // CAMBIAR
+      targetImage:
+        'assets/ar/teams/target/dorados.png',
+
+      // CAMBIAR
+      model:
+        'assets/ar/teams/models/guante.glb',
+
+      modelLabel:
+        'Modelo 3D de Dorados de Chihuahua',
+
+      modelScale: 0.55,
+
       intro:
         'Nombre de varias etapas del béisbol profesional de Chihuahua dentro de la Liga Mexicana.',
 
@@ -573,9 +696,12 @@
     }
   ];
 
-
+  /*
+    El catálogo se expone globalmente porque
+    js/ar/team-viewer.js utiliza exactamente
+    estos mismos datos para el reconocimiento AR.
+  */
   window.STRIKEZONE_TEAMS = teams;
-
 
   // Proteger textos al crear HTML.
   function escape(value) {
@@ -589,6 +715,52 @@
         "'": '&#39;'
       })[character]
     );
+  }
+
+  /*
+    Devuelve el HTML del logo del equipo.
+
+    Si targetImage existe:
+      muestra el logo real.
+
+    Si alguna imagen falla:
+      muestra automáticamente el código del equipo
+      como respaldo visual.
+  */
+  function teamLogoMarkup(team, className) {
+    const imageUrl =
+      escape(team.targetImage);
+
+    const name =
+      escape(team.name);
+
+    const code =
+      escape(team.code);
+
+    return `
+      <div
+        class="${className}"
+        data-team-logo
+      >
+        <img
+          src="${imageUrl}"
+          alt="Logo de ${name}"
+          loading="lazy"
+          onerror="
+            this.hidden=true;
+            this.nextElementSibling.hidden=false;
+          "
+        >
+
+        <span
+          class="history-team-logo-fallback"
+          hidden
+          aria-hidden="true"
+        >
+          ${code}
+        </span>
+      </div>
+    `;
   }
 
   // Renderizar una línea del tiempo.
@@ -609,6 +781,7 @@
               loading="lazy"
               onerror="this.onerror=null;this.src='assets/history/1939.png'"
             >
+
             <span>Imagen ilustrativa</span>
           </div>
 
@@ -652,19 +825,23 @@
   }
 
   // Página de equipos.
-  const grid = $('[data-teams-grid]');
+  const grid =
+    $('[data-teams-grid]');
 
   /*
-    IMPORTANTE:
     En ar-equipo.html no existe data-teams-grid.
-    El catálogo ya quedó expuesto arriba mediante
-    window.STRIKEZONE_TEAMS, así que aquí podemos salir
-    sin afectar el escáner AR.
+
+    El catálogo ya quedó expuesto mediante
+    window.STRIKEZONE_TEAMS antes de este return,
+    así que el escáner AR puede utilizar los equipos
+    aunque esta página no sea historia-equipo.html.
   */
   if (!grid) return;
 
   const teamId =
-    new URLSearchParams(location.search).get('team');
+    new URLSearchParams(
+      location.search
+    ).get('team');
 
   const detail =
     $('[data-team-detail]');
@@ -680,58 +857,121 @@
 
   // Vista general de todos los equipos.
   if (!teamId) {
-    grid.innerHTML = teams.map(team => `
-      <a
-        class="history-team-card"
-        href="historia-equipo.html?team=${encodeURIComponent(team.id)}"
-        aria-label="Ver historia de ${escape(team.name)}"
-      >
-        <div
-          class="history-team-logo"
-          aria-hidden="true"
+    grid.innerHTML =
+      teams.map(team => `
+        <a
+          class="history-team-card"
+          href="historia-equipo.html?team=${encodeURIComponent(team.id)}"
+          aria-label="Ver historia de ${escape(team.name)}"
         >
-          ${escape(team.code)}
-        </div>
+          ${teamLogoMarkup(
+            team,
+            'history-team-logo'
+          )}
 
-        <h3>${escape(team.name)}</h3>
+          <h3>
+            ${escape(team.name)}
+          </h3>
 
-        <p>${escape(team.city)}</p>
-      </a>
-    `).join('');
+          <p>
+            ${escape(team.city)}
+          </p>
+        </a>
+      `).join('');
 
     return;
   }
 
   const team =
-    teams.find(item => item.id === teamId);
+    teams.find(
+      item =>
+        item.id === teamId
+    );
 
   if (!team) {
-    if (list) list.hidden = true;
-    if (hero) hero.hidden = true;
-    if (error) error.hidden = false;
+    if (list) {
+      list.hidden = true;
+    }
+
+    if (hero) {
+      hero.hidden = true;
+    }
+
+    if (error) {
+      error.hidden = false;
+    }
 
     return;
   }
 
   // Mostrar exclusivamente la historia seleccionada.
-  if (list) list.hidden = true;
-  if (hero) hero.hidden = true;
-  if (detail) detail.hidden = false;
+  if (list) {
+    list.hidden = true;
+  }
+
+  if (hero) {
+    hero.hidden = true;
+  }
+
+  if (detail) {
+    detail.hidden = false;
+  }
 
   document.title =
     `StrikeZone | Historia de ${team.name}`;
 
-  $('[data-team-name]').textContent =
-    team.name;
+  const nameElement =
+    $('[data-team-name]');
 
-  $('[data-team-city]').textContent =
-    team.city;
+  const cityElement =
+    $('[data-team-city]');
 
-  $('[data-team-intro]').textContent =
-    team.intro;
+  const introElement =
+    $('[data-team-intro]');
 
-  $('[data-team-emblem]').textContent =
-    team.code;
+  const emblemElement =
+    $('[data-team-emblem]');
+
+  if (nameElement) {
+    nameElement.textContent =
+      team.name;
+  }
+
+  if (cityElement) {
+    cityElement.textContent =
+      team.city;
+  }
+
+  if (introElement) {
+    introElement.textContent =
+      team.intro;
+  }
+
+  /*
+    Vista individual:
+    reemplazamos las antiguas siglas por el
+    mismo logo utilizado como target AR.
+  */
+  if (emblemElement) {
+    emblemElement.innerHTML = `
+      <img
+        src="${escape(team.targetImage)}"
+        alt="Logo de ${escape(team.name)}"
+        onerror="
+          this.hidden=true;
+          this.nextElementSibling.hidden=false;
+        "
+      >
+
+      <span
+        class="history-team-logo-fallback"
+        hidden
+        aria-hidden="true"
+      >
+        ${escape(team.code)}
+      </span>
+    `;
+  }
 
   renderTimeline(
     $('[data-team-timeline]'),
