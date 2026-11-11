@@ -209,25 +209,61 @@ function hideError() {
   ==========================================================
 */
 
-function loadImageElement(src) {
+/*
+  ==========================================================
+  COMPILACIÓN DE TARGETS
+  ==========================================================
+*/
+
+function loadImageElement(team) {
   return new Promise(
     (resolve, reject) => {
       const image =
         new Image();
 
       image.onload =
-        () => resolve(image);
+        () => {
+          /*
+            Un target demasiado pequeño puede producir
+            resultados pobres o errores durante la
+            compilación.
+
+            No detenemos el proceso por tamaño, pero
+            dejamos una advertencia útil en consola.
+          */
+          if (
+            image.naturalWidth < 128 ||
+            image.naturalHeight < 128
+          ) {
+            console.warn(
+              `Target AR pequeño para ${team.name}:`,
+              team.targetImage,
+              `${image.naturalWidth}x${image.naturalHeight}`
+            );
+          }
+
+          resolve({
+            team,
+            image
+          });
+        };
 
       image.onerror =
         () => {
           reject(
             new Error(
-              `No se pudo cargar el logo AR: ${src}`
+              `No se pudo cargar el logo AR de ${team.name}: ${team.targetImage}`
             )
           );
         };
 
-      image.src = src;
+      /*
+        Los targets están dentro del mismo dominio
+        de StrikeZone, por lo que no necesitamos
+        crossOrigin.
+      */
+      image.src =
+        team.targetImage;
     }
   );
 }
@@ -251,53 +287,143 @@ async function prepareTargets() {
   }
 
   status(
-    'Preparando reconocimiento del logo…'
+    'Cargando logos de equipos…'
   );
 
-  const images =
-    await Promise.all(
-      teams.map(team =>
-        loadImageElement(
-          team.targetImage
-        )
-      )
+  /*
+    Primero cargamos cada target de manera individual.
+
+    Así, si una ruta está mal, el error indica
+    exactamente qué equipo está causando el problema.
+  */
+  const loadedTargets = [];
+
+  for (
+    let index = 0;
+    index < teams.length;
+    index += 1
+  ) {
+    const team =
+      teams[index];
+
+    status(
+      `Cargando logo ${index + 1} de ${teams.length}: ${team.name}…`
     );
+
+    try {
+      const target =
+        await loadImageElement(
+          team
+        );
+
+      loadedTargets.push(
+        target
+      );
+
+    } catch (error) {
+      console.error(
+        'Error cargando target AR:',
+        team,
+        error
+      );
+
+      throw error;
+    }
+  }
+
+  /*
+    El orden es fundamental.
+
+    images[0] debe corresponder con teams[0],
+    images[1] con teams[1], etc., porque después
+    configureAnchors() utiliza ese mismo índice.
+  */
+  const images =
+    loadedTargets.map(
+      target =>
+        target.image
+    );
+
+  if (
+    images.length !==
+    teams.length
+  ) {
+    throw new Error(
+      'No se pudieron preparar todos los logos AR.'
+    );
+  }
+
+  status(
+    `Preparando reconocimiento de ${images.length} equipos…`
+  );
 
   const compiler =
     new Compiler();
 
-  await compiler.compileImageTargets(
-    images,
+  try {
+    await compiler.compileImageTargets(
+      images,
 
-    progress => {
-      const value =
-        Number(progress);
+      progress => {
+        const value =
+          Number(progress);
 
-      const percentage =
-        Number.isFinite(value)
-          ? Math.round(
-              value <= 1
-                ? value * 100
-                : value
+        const percentage =
+          Number.isFinite(value)
+            ? Math.round(
+                value <= 1
+                  ? value * 100
+                  : value
+              )
+            : 0;
+
+        status(
+          `Preparando reconocimiento… ${
+            Math.max(
+              0,
+              Math.min(
+                100,
+                percentage
+              )
             )
-          : 0;
+          }%`
+        );
+      }
+    );
 
-      status(
-        `Preparando reconocimiento… ${
-          Math.max(
-            0,
-            Math.min(
-              100,
-              percentage
-            )
-          )
-        }%`
-      );
-    }
-  );
+  } catch (error) {
+    console.error(
+      'MindAR no pudo compilar los targets:',
+      error
+    );
 
-  const buffer =
-    await compiler.exportData();
+    throw new Error(
+      'MindAR no pudo preparar los logos de los equipos. Revisa que las imágenes tengan suficiente detalle y vuelve a intentarlo.'
+    );
+  }
+
+  let buffer;
+
+  try {
+    buffer =
+      await compiler.exportData();
+
+  } catch (error) {
+    console.error(
+      'Error exportando targets MindAR:',
+      error
+    );
+
+    throw new Error(
+      'No se pudo generar el reconocimiento AR de los equipos.'
+    );
+  }
+
+  if (!buffer) {
+    throw new Error(
+      'MindAR no generó datos de reconocimiento.'
+    );
+  }
 
   if (compiledBlobUrl) {
     URL.revokeObjectURL(
@@ -315,6 +441,10 @@ async function prepareTargets() {
         }
       )
     );
+
+  console.info(
+    `StrikeZone AR: ${teams.length} equipos preparados correctamente.`
+  );
 
   return compiledBlobUrl;
 }
